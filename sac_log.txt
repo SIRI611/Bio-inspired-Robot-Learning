@@ -1,0 +1,316 @@
+######################### Start train #########################
+Tot_step: 463    	 | Episode: 20   	 | Time: 35.90 	 | Reward : 178.138 	 | actor_loss : 115.236 	 | critic_loss : 18688.909
+Tot_step: 920    	 | Episode: 40   	 | Time: 22.85 	 | Reward : 114.779 	 | actor_loss : 144.798 	 | critic_loss : 8851.733
+Tot_step: 1408   	 | Episode: 60   	 | Time: 24.40 	 | Reward : 120.953 	 | actor_loss : 139.203 	 | critic_loss : 5149.796
+Tot_step: 1925   	 | Episode: 80   	 | Time: 25.85 	 | Reward : 130.932 	 | actor_loss : 126.540 	 | critic_loss : 3072.673
+Tot_step: 2414   	 | Episode: 100  	 | Time: 24.45 	 | Reward : 122.512 	 | actor_loss : 103.694 	 | critic_loss : 1984.685
+Tot_step: 2831   	 | Episode: 120  	 | Time: 20.85 	 | Reward : 105.310 	 | actor_loss : 80.687 	 | critic_loss : 1389.872
+Tot_step: 3333   	 | Episode: 140  	 | Time: 25.10 	 | Reward : 127.241 	 | actor_loss : 56.924 	 | critic_loss : 913.669
+Tot_step: 3841   	 | Episode: 160  	 | Time: 25.40 	 | Reward : 127.250 	 | actor_loss : 33.911 	 | critic_loss : 550.722
+Tot_step: 4321   	 | Episode: 180  	 | Time: 24.00 	 | Reward : 120.226 	 | actor_loss : 15.792 	 | critic_loss : 337.960
+Tot_step: 4820   	 | Episode: 200  	 | Time: 24.95 	 | Reward : 126.397 	 | actor_loss : 0.889 	 | critic_loss : 236.869
+Tot_step: 5323   	 | Episode: 220  	 | Time: 25.15 	 | Reward : 125.246 	 | actor_loss : -12.140 	 | critic_loss : 157.736
+Tot_step: 5769   	 | Episode: 240  	 | Time: 22.30 	 | Reward : 111.437 	 | actor_loss : -22.419 	 | critic_loss : 127.062
+Tot_step: 6249   	 | Episode: 260  	 | Time: 24.00 	 | Reward : 121.678 	 | actor_loss : -30.130 	 | critic_loss : 128.148
+Tot_step: 6744   	 | Episode: 280  	 | Time: 24.75 	 | Reward : 122.498 	 | actor_loss : -36.402 	 | critic_loss : 132.028
+Tot_step: 7235   	 | Episode: 300  	 | Time: 24.55 	 | Reward : 123.549 	 | actor_loss : -39.946 	 | critic_loss : 142.994
+Tot_step: 7735   	 | Episode: 320  	 | Time: 25.00 	 | Reward : 125.276 	 | actor_loss : -42.917 	 | critic_loss : 139.063
+Tot_step: 8269   	 | Episode: 340  	 | Time: 26.70 	 | Reward : 134.464 	 | actor_loss : -45.151 	 | critic_loss : 148.087
+Tot_step: 8755   	 | Episode: 360  	 | Time: 24.30 	 | Reward : 121.623 	 | actor_loss : -48.943 	 | critic_loss : 148.457
+Tot_step: 9269   	 | Episode: 380  	 | Time: 25.70 	 | Reward : 127.689 	 | actor_loss : -54.166 	 | critic_loss : 154.156
+Tot_step: 9771   	 | Episode: 400  	 | Time: 25.10 	 | Reward : 126.563 	 | actor_loss : -60.793 	 | critic_loss : 165.065
+Tot_step: 10513  	 | Episode: 420  	 | Time: 37.10 	 | Reward : 197.302 	 | actor_loss : -68.317 	 | critic_loss : 174.043
+Tot_step: 11495  	 | Episode: 440  	 | Time: 49.10 	 | Reward : 251.084 	 | actor_loss : -76.890 	 | critic_loss : 190.754
+Tot_step: 12232  	 | Episode: 460  	 | Time: 36.85 	 | Reward : 190.758 	 | actor_loss : -81.434 	 | critic_loss : 187.908
+Tot_step: 13763  	 | Episode: 480  	 | Time: 76.55 	 | Reward : 387.059 	 | actor_loss : -85.050 	 | critic_loss : 179.306
+Tot_step: 15264  	 | Episode: 500  	 | Time: 75.05 	 | Reward : 395.118 	 | actor_loss : -85.813 	 | critic_loss : 151.117
+Tot_step: 16771  	 | Episode: 520  	 | Time: 75.35 	 | Reward : 376.319 	 | actor_loss : -85.409 	 | critic_loss : 123.528
+Tot_step: 18157  	 | Episode: 540  	 | Time: 69.30 	 | Reward : 364.177 	 | actor_loss : -84.941 	 | critic_loss : 102.580
+Tot_step: 19606  	 | Episode: 560  	 | Time: 72.45 	 | Reward : 379.651 	 | actor_loss : -85.684 	 | critic_loss : 91.253
+Tot_step: 21056  	 | Episode: 580  	 | Time: 72.50 	 | Reward : 374.500 	 | actor_loss : -87.113 	 | critic_loss : 79.514
+Tot_step: 22534  	 | Episode: 600  	 | Time: 73.90 	 | Reward : 380.717 	 | actor_loss : -89.002 	 | critic_loss : 76.510
+Tot_step: 24194  	 | Episode: 620  	 | Time: 83.00 	 | Reward : 439.271 	 | actor_loss : -91.099 	 | critic_loss : 73.682
+Tot_step: 25710  	 | Episode: 640  	 | Time: 75.80 	 | Reward : 373.004 	 | actor_loss : -92.850 	 | critic_loss : 72.913
+Tot_step: 27111  	 | Episode: 660  	 | Time: 70.05 	 | Reward : 379.462 	 | actor_loss : -93.870 	 | critic_loss : 69.171
+Tot_step: 28517  	 | Episode: 680  	 | Time: 70.30 	 | Reward : 375.133 	 | actor_loss : -94.796 	 | critic_loss : 69.282
+Tot_step: 29979  	 | Episode: 700  	 | Time: 73.10 	 | Reward : 387.750 	 | actor_loss : -95.553 	 | critic_loss : 70.298
+Tot_step: 31514  	 | Episode: 720  	 | Time: 76.75 	 | Reward : 396.433 	 | actor_loss : -96.379 	 | critic_loss : 67.743
+######################### Start train #########################
+Tot_step: 468    	 | Episode: 20   	 | Time: 36.15 	 | Reward : 178.664 	 | actor_loss : 148.845 	 | critic_loss : 20813.981
+Tot_step: 1028   	 | Episode: 40   	 | Time: 28.00 	 | Reward : 140.299 	 | actor_loss : 181.683 	 | critic_loss : 10733.473
+Tot_step: 1519   	 | Episode: 60   	 | Time: 24.55 	 | Reward : 122.707 	 | actor_loss : 170.373 	 | critic_loss : 5771.034
+Tot_step: 1985   	 | Episode: 80   	 | Time: 23.30 	 | Reward : 116.725 	 | actor_loss : 146.305 	 | critic_loss : 3729.016
+Tot_step: 2473   	 | Episode: 100  	 | Time: 24.40 	 | Reward : 121.431 	 | actor_loss : 122.186 	 | critic_loss : 2817.111
+Tot_step: 2932   	 | Episode: 120  	 | Time: 22.95 	 | Reward : 114.370 	 | actor_loss : 97.475 	 | critic_loss : 2167.558
+Tot_step: 3430   	 | Episode: 140  	 | Time: 24.90 	 | Reward : 124.727 	 | actor_loss : 72.722 	 | critic_loss : 1675.051
+Tot_step: 3887   	 | Episode: 160  	 | Time: 22.85 	 | Reward : 114.652 	 | actor_loss : 46.869 	 | critic_loss : 1019.178
+Tot_step: 4317   	 | Episode: 180  	 | Time: 21.50 	 | Reward : 108.691 	 | actor_loss : 24.398 	 | critic_loss : 631.356
+Tot_step: 4752   	 | Episode: 200  	 | Time: 21.75 	 | Reward : 108.581 	 | actor_loss : 7.095 	 | critic_loss : 482.326
+Tot_step: 5240   	 | Episode: 220  	 | Time: 24.40 	 | Reward : 122.790 	 | actor_loss : -8.825 	 | critic_loss : 271.280
+Tot_step: 5737   	 | Episode: 240  	 | Time: 24.85 	 | Reward : 123.824 	 | actor_loss : -21.588 	 | critic_loss : 204.433
+Tot_step: 6203   	 | Episode: 260  	 | Time: 23.30 	 | Reward : 117.118 	 | actor_loss : -30.870 	 | critic_loss : 187.565
+Tot_step: 6662   	 | Episode: 280  	 | Time: 22.95 	 | Reward : 115.914 	 | actor_loss : -37.136 	 | critic_loss : 176.923
+Tot_step: 7164   	 | Episode: 300  	 | Time: 25.10 	 | Reward : 125.574 	 | actor_loss : -40.437 	 | critic_loss : 187.270
+Tot_step: 7624   	 | Episode: 320  	 | Time: 23.00 	 | Reward : 115.865 	 | actor_loss : -42.276 	 | critic_loss : 188.016
+Tot_step: 8099   	 | Episode: 340  	 | Time: 23.75 	 | Reward : 119.540 	 | actor_loss : -43.150 	 | critic_loss : 192.168
+Tot_step: 8539   	 | Episode: 360  	 | Time: 22.00 	 | Reward : 108.871 	 | actor_loss : -44.565 	 | critic_loss : 182.790
+Tot_step: 9037   	 | Episode: 380  	 | Time: 24.90 	 | Reward : 124.611 	 | actor_loss : -46.931 	 | critic_loss : 201.163
+Tot_step: 9497   	 | Episode: 400  	 | Time: 23.00 	 | Reward : 115.224 	 | actor_loss : -50.763 	 | critic_loss : 207.231
+Tot_step: 10074  	 | Episode: 420  	 | Time: 28.85 	 | Reward : 144.945 	 | actor_loss : -55.686 	 | critic_loss : 210.917
+Tot_step: 11391  	 | Episode: 440  	 | Time: 65.85 	 | Reward : 336.822 	 | actor_loss : -66.327 	 | critic_loss : 248.686
+Tot_step: 13005  	 | Episode: 460  	 | Time: 80.70 	 | Reward : 402.839 	 | actor_loss : -79.296 	 | critic_loss : 239.012
+Tot_step: 14411  	 | Episode: 480  	 | Time: 70.30 	 | Reward : 355.244 	 | actor_loss : -86.890 	 | critic_loss : 203.428
+Tot_step: 15711  	 | Episode: 500  	 | Time: 65.00 	 | Reward : 349.258 	 | actor_loss : -89.768 	 | critic_loss : 169.997
+Tot_step: 16927  	 | Episode: 520  	 | Time: 60.80 	 | Reward : 321.405 	 | actor_loss : -90.628 	 | critic_loss : 144.619
+Tot_step: 18412  	 | Episode: 540  	 | Time: 74.25 	 | Reward : 374.345 	 | actor_loss : -90.370 	 | critic_loss : 125.232
+Tot_step: 19799  	 | Episode: 560  	 | Time: 69.35 	 | Reward : 347.253 	 | actor_loss : -90.163 	 | critic_loss : 104.783
+Tot_step: 21320  	 | Episode: 580  	 | Time: 76.05 	 | Reward : 392.178 	 | actor_loss : -91.093 	 | critic_loss : 84.401
+Tot_step: 22907  	 | Episode: 600  	 | Time: 79.35 	 | Reward : 405.415 	 | actor_loss : -92.668 	 | critic_loss : 81.112
+Tot_step: 24646  	 | Episode: 620  	 | Time: 86.95 	 | Reward : 437.995 	 | actor_loss : -94.934 	 | critic_loss : 75.948
+Tot_step: 26189  	 | Episode: 640  	 | Time: 77.15 	 | Reward : 401.712 	 | actor_loss : -97.396 	 | critic_loss : 73.518
+Tot_step: 27741  	 | Episode: 660  	 | Time: 77.60 	 | Reward : 390.766 	 | actor_loss : -98.762 	 | critic_loss : 73.189
+Tot_step: 29329  	 | Episode: 680  	 | Time: 79.40 	 | Reward : 400.768 	 | actor_loss : -100.144 	 | critic_loss : 72.634
+Tot_step: 31058  	 | Episode: 700  	 | Time: 86.45 	 | Reward : 438.357 	 | actor_loss : -101.095 	 | critic_loss : 71.242
+Tot_step: 32667  	 | Episode: 720  	 | Time: 80.45 	 | Reward : 404.505 	 | actor_loss : -101.923 	 | critic_loss : 70.351
+Tot_step: 34391  	 | Episode: 740  	 | Time: 86.20 	 | Reward : 416.090 	 | actor_loss : -102.737 	 | critic_loss : 69.499
+Tot_step: 36127  	 | Episode: 760  	 | Time: 86.80 	 | Reward : 424.053 	 | actor_loss : -102.949 	 | critic_loss : 68.190
+Tot_step: 37730  	 | Episode: 780  	 | Time: 80.15 	 | Reward : 411.948 	 | actor_loss : -103.104 	 | critic_loss : 63.656
+Tot_step: 39430  	 | Episode: 800  	 | Time: 85.00 	 | Reward : 444.337 	 | actor_loss : -103.187 	 | critic_loss : 63.494
+Tot_step: 40998  	 | Episode: 820  	 | Time: 78.40 	 | Reward : 408.979 	 | actor_loss : -103.706 	 | critic_loss : 61.339
+Tot_step: 42896  	 | Episode: 840  	 | Time: 94.90 	 | Reward : 482.383 	 | actor_loss : -104.637 	 | critic_loss : 58.800
+Tot_step: 44557  	 | Episode: 860  	 | Time: 83.05 	 | Reward : 426.408 	 | actor_loss : -105.389 	 | critic_loss : 56.394
+Tot_step: 46354  	 | Episode: 880  	 | Time: 89.85 	 | Reward : 449.166 	 | actor_loss : -106.369 	 | critic_loss : 54.967
+Tot_step: 48006  	 | Episode: 900  	 | Time: 82.60 	 | Reward : 413.332 	 | actor_loss : -106.810 	 | critic_loss : 54.139
+Tot_step: 49675  	 | Episode: 920  	 | Time: 83.45 	 | Reward : 425.574 	 | actor_loss : -107.713 	 | critic_loss : 50.913
+Tot_step: 51485  	 | Episode: 940  	 | Time: 90.50 	 | Reward : 454.278 	 | actor_loss : -108.890 	 | critic_loss : 51.644
+Tot_step: 53184  	 | Episode: 960  	 | Time: 84.95 	 | Reward : 443.624 	 | actor_loss : -109.919 	 | critic_loss : 51.499
+Tot_step: 55219  	 | Episode: 980  	 | Time: 101.75 	 | Reward : 523.863 	 | actor_loss : -111.271 	 | critic_loss : 49.485
+Tot_step: 56934  	 | Episode: 1000 	 | Time: 85.75 	 | Reward : 454.350 	 | actor_loss : -112.180 	 | critic_loss : 48.750
+Tot_step: 58458  	 | Episode: 1020 	 | Time: 76.20 	 | Reward : 406.018 	 | actor_loss : -113.343 	 | critic_loss : 47.878
+Tot_step: 60367  	 | Episode: 1040 	 | Time: 95.45 	 | Reward : 507.075 	 | actor_loss : -114.683 	 | critic_loss : 46.761
+Tot_step: 62370  	 | Episode: 1060 	 | Time: 100.15 	 | Reward : 520.258 	 | actor_loss : -115.943 	 | critic_loss : 45.733
+Tot_step: 64491  	 | Episode: 1080 	 | Time: 106.05 	 | Reward : 535.202 	 | actor_loss : -117.325 	 | critic_loss : 45.974
+Tot_step: 66767  	 | Episode: 1100 	 | Time: 113.80 	 | Reward : 552.294 	 | actor_loss : -118.356 	 | critic_loss : 46.373
+Tot_step: 68891  	 | Episode: 1120 	 | Time: 106.20 	 | Reward : 546.116 	 | actor_loss : -119.347 	 | critic_loss : 44.856
+Tot_step: 71079  	 | Episode: 1140 	 | Time: 109.40 	 | Reward : 555.305 	 | actor_loss : -120.249 	 | critic_loss : 45.954
+Tot_step: 73475  	 | Episode: 1160 	 | Time: 119.80 	 | Reward : 595.809 	 | actor_loss : -121.306 	 | critic_loss : 45.765
+Tot_step: 75519  	 | Episode: 1180 	 | Time: 102.20 	 | Reward : 501.857 	 | actor_loss : -122.044 	 | critic_loss : 48.828
+Tot_step: 77961  	 | Episode: 1200 	 | Time: 122.10 	 | Reward : 632.741 	 | actor_loss : -122.826 	 | critic_loss : 45.391
+Tot_step: 80182  	 | Episode: 1220 	 | Time: 111.05 	 | Reward : 588.512 	 | actor_loss : -123.870 	 | critic_loss : 47.032
+Tot_step: 82514  	 | Episode: 1240 	 | Time: 116.60 	 | Reward : 603.002 	 | actor_loss : -124.571 	 | critic_loss : 46.670
+Tot_step: 84951  	 | Episode: 1260 	 | Time: 121.85 	 | Reward : 624.603 	 | actor_loss : -125.652 	 | critic_loss : 46.998
+Tot_step: 87532  	 | Episode: 1280 	 | Time: 129.05 	 | Reward : 664.300 	 | actor_loss : -127.062 	 | critic_loss : 45.966
+Tot_step: 90241  	 | Episode: 1300 	 | Time: 135.45 	 | Reward : 698.151 	 | actor_loss : -127.986 	 | critic_loss : 47.376
+Tot_step: 92802  	 | Episode: 1320 	 | Time: 128.05 	 | Reward : 651.749 	 | actor_loss : -128.814 	 | critic_loss : 46.957
+Tot_step: 95562  	 | Episode: 1340 	 | Time: 138.00 	 | Reward : 693.760 	 | actor_loss : -129.349 	 | critic_loss : 48.194
+Tot_step: 98204  	 | Episode: 1360 	 | Time: 132.10 	 | Reward : 671.269 	 | actor_loss : -129.955 	 | critic_loss : 47.613
+Tot_step: 100697 	 | Episode: 1380 	 | Time: 124.65 	 | Reward : 656.036 	 | actor_loss : -131.020 	 | critic_loss : 47.821
+Tot_step: 103665 	 | Episode: 1400 	 | Time: 148.40 	 | Reward : 770.132 	 | actor_loss : -131.825 	 | critic_loss : 47.350
+Tot_step: 106800 	 | Episode: 1420 	 | Time: 156.75 	 | Reward : 812.792 	 | actor_loss : -133.005 	 | critic_loss : 48.285
+Tot_step: 110042 	 | Episode: 1440 	 | Time: 162.10 	 | Reward : 835.289 	 | actor_loss : -134.375 	 | critic_loss : 47.722
+Tot_step: 113309 	 | Episode: 1460 	 | Time: 163.35 	 | Reward : 832.782 	 | actor_loss : -135.892 	 | critic_loss : 48.293
+Tot_step: 116337 	 | Episode: 1480 	 | Time: 151.40 	 | Reward : 784.310 	 | actor_loss : -137.295 	 | critic_loss : 48.525
+Tot_step: 119253 	 | Episode: 1500 	 | Time: 145.80 	 | Reward : 743.472 	 | actor_loss : -139.122 	 | critic_loss : 49.061
+Tot_step: 122466 	 | Episode: 1520 	 | Time: 160.65 	 | Reward : 812.268 	 | actor_loss : -140.243 	 | critic_loss : 49.657
+Tot_step: 125684 	 | Episode: 1540 	 | Time: 160.90 	 | Reward : 801.741 	 | actor_loss : -141.009 	 | critic_loss : 49.986
+Tot_step: 128940 	 | Episode: 1560 	 | Time: 162.80 	 | Reward : 815.244 	 | actor_loss : -141.899 	 | critic_loss : 51.416
+Tot_step: 132356 	 | Episode: 1580 	 | Time: 170.80 	 | Reward : 869.408 	 | actor_loss : -142.647 	 | critic_loss : 51.849
+Tot_step: 135450 	 | Episode: 1600 	 | Time: 154.70 	 | Reward : 786.780 	 | actor_loss : -143.753 	 | critic_loss : 52.315
+Tot_step: 139020 	 | Episode: 1620 	 | Time: 178.50 	 | Reward : 907.757 	 | actor_loss : -144.780 	 | critic_loss : 52.916
+Tot_step: 142873 	 | Episode: 1640 	 | Time: 192.65 	 | Reward : 980.030 	 | actor_loss : -145.932 	 | critic_loss : 54.171
+Tot_step: 146358 	 | Episode: 1660 	 | Time: 174.25 	 | Reward : 875.448 	 | actor_loss : -146.485 	 | critic_loss : 54.104
+Tot_step: 149403 	 | Episode: 1680 	 | Time: 152.25 	 | Reward : 763.284 	 | actor_loss : -146.789 	 | critic_loss : 53.959
+Tot_step: 153156 	 | Episode: 1700 	 | Time: 187.65 	 | Reward : 922.710 	 | actor_loss : -146.965 	 | critic_loss : 54.481
+Tot_step: 156799 	 | Episode: 1720 	 | Time: 182.15 	 | Reward : 925.493 	 | actor_loss : -147.557 	 | critic_loss : 54.430
+Tot_step: 160607 	 | Episode: 1740 	 | Time: 190.40 	 | Reward : 965.198 	 | actor_loss : -148.337 	 | critic_loss : 54.128
+Tot_step: 164435 	 | Episode: 1760 	 | Time: 191.40 	 | Reward : 996.012 	 | actor_loss : -149.257 	 | critic_loss : 53.472
+Tot_step: 168314 	 | Episode: 1780 	 | Time: 193.95 	 | Reward : 1000.280 	 | actor_loss : -150.234 	 | critic_loss : 53.775
+Tot_step: 172064 	 | Episode: 1800 	 | Time: 187.50 	 | Reward : 974.320 	 | actor_loss : -151.568 	 | critic_loss : 53.349
+Tot_step: 175713 	 | Episode: 1820 	 | Time: 182.45 	 | Reward : 930.861 	 | actor_loss : -152.684 	 | critic_loss : 52.985
+Tot_step: 179423 	 | Episode: 1840 	 | Time: 185.50 	 | Reward : 953.417 	 | actor_loss : -153.350 	 | critic_loss : 53.182
+Tot_step: 183993 	 | Episode: 1860 	 | Time: 228.50 	 | Reward : 1164.417 	 | actor_loss : -154.688 	 | critic_loss : 53.316
+Tot_step: 188866 	 | Episode: 1880 	 | Time: 243.65 	 | Reward : 1232.106 	 | actor_loss : -156.288 	 | critic_loss : 53.402
+Tot_step: 194857 	 | Episode: 1900 	 | Time: 299.55 	 | Reward : 1537.991 	 | actor_loss : -158.300 	 | critic_loss : 54.121
+Tot_step: 202378 	 | Episode: 1920 	 | Time: 376.05 	 | Reward : 1914.739 	 | actor_loss : -161.414 	 | critic_loss : 55.058
+Tot_step: 209533 	 | Episode: 1940 	 | Time: 357.75 	 | Reward : 1815.324 	 | actor_loss : -164.181 	 | critic_loss : 56.026
+Tot_step: 218609 	 | Episode: 1960 	 | Time: 453.80 	 | Reward : 2292.162 	 | actor_loss : -166.431 	 | critic_loss : 56.556
+Tot_step: 228777 	 | Episode: 1980 	 | Time: 508.40 	 | Reward : 2599.390 	 | actor_loss : -170.401 	 | critic_loss : 57.118
+Tot_step: 238276 	 | Episode: 2000 	 | Time: 474.95 	 | Reward : 2397.662 	 | actor_loss : -174.112 	 | critic_loss : 57.338
+Tot_step: 248295 	 | Episode: 2020 	 | Time: 500.95 	 | Reward : 2539.619 	 | actor_loss : -177.951 	 | critic_loss : 59.491
+Tot_step: 258869 	 | Episode: 2040 	 | Time: 528.70 	 | Reward : 2690.680 	 | actor_loss : -180.795 	 | critic_loss : 58.921
+Tot_step: 272881 	 | Episode: 2060 	 | Time: 700.60 	 | Reward : 3573.429 	 | actor_loss : -184.479 	 | critic_loss : 58.897
+Tot_step: 289031 	 | Episode: 2080 	 | Time: 807.50 	 | Reward : 4116.364 	 | actor_loss : -191.014 	 | critic_loss : 58.768
+Tot_step: 305206 	 | Episode: 2100 	 | Time: 808.75 	 | Reward : 4123.903 	 | actor_loss : -198.254 	 | critic_loss : 59.320
+Tot_step: 321140 	 | Episode: 2120 	 | Time: 796.70 	 | Reward : 4024.257 	 | actor_loss : -204.471 	 | critic_loss : 59.881
+Tot_step: 339469 	 | Episode: 2140 	 | Time: 916.45 	 | Reward : 4621.984 	 | actor_loss : -211.936 	 | critic_loss : 60.041
+Tot_step: 359284 	 | Episode: 2160 	 | Time: 990.75 	 | Reward : 5019.025 	 | actor_loss : -219.997 	 | critic_loss : 59.916
+Tot_step: 377212 	 | Episode: 2180 	 | Time: 896.40 	 | Reward : 4528.293 	 | actor_loss : -229.767 	 | critic_loss : 59.402
+Tot_step: 396439 	 | Episode: 2200 	 | Time: 961.35 	 | Reward : 4859.925 	 | actor_loss : -239.659 	 | critic_loss : 60.633
+Tot_step: 415349 	 | Episode: 2220 	 | Time: 945.50 	 | Reward : 4782.737 	 | actor_loss : -248.502 	 | critic_loss : 61.171
+Tot_step: 435122 	 | Episode: 2240 	 | Time: 988.65 	 | Reward : 4998.890 	 | actor_loss : -257.663 	 | critic_loss : 60.419
+Tot_step: 454385 	 | Episode: 2260 	 | Time: 963.15 	 | Reward : 4856.875 	 | actor_loss : -265.658 	 | critic_loss : 60.081
+Tot_step: 473637 	 | Episode: 2280 	 | Time: 962.60 	 | Reward : 4897.356 	 | actor_loss : -273.623 	 | critic_loss : 58.998
+Tot_step: 493369 	 | Episode: 2300 	 | Time: 986.60 	 | Reward : 5039.299 	 | actor_loss : -280.598 	 | critic_loss : 57.868
+Tot_step: 511794 	 | Episode: 2320 	 | Time: 921.25 	 | Reward : 4701.421 	 | actor_loss : -287.718 	 | critic_loss : 56.874
+Tot_step: 530201 	 | Episode: 2340 	 | Time: 920.35 	 | Reward : 4634.627 	 | actor_loss : -293.167 	 | critic_loss : 58.781
+Tot_step: 548983 	 | Episode: 2360 	 | Time: 939.10 	 | Reward : 4779.576 	 | actor_loss : -296.733 	 | critic_loss : 57.308
+Tot_step: 567534 	 | Episode: 2380 	 | Time: 927.55 	 | Reward : 4767.613 	 | actor_loss : -300.393 	 | critic_loss : 56.438
+Tot_step: 586723 	 | Episode: 2400 	 | Time: 959.45 	 | Reward : 4883.598 	 | actor_loss : -304.411 	 | critic_loss : 55.542
+Tot_step: 606537 	 | Episode: 2420 	 | Time: 990.70 	 | Reward : 5020.641 	 | actor_loss : -309.848 	 | critic_loss : 53.179
+Tot_step: 626359 	 | Episode: 2440 	 | Time: 991.10 	 | Reward : 5100.201 	 | actor_loss : -316.129 	 | critic_loss : 53.218
+Tot_step: 646359 	 | Episode: 2460 	 | Time: 1000.00 	 | Reward : 5150.776 	 | actor_loss : -322.066 	 | critic_loss : 51.666
+Tot_step: 666359 	 | Episode: 2480 	 | Time: 1000.00 	 | Reward : 5160.892 	 | actor_loss : -327.161 	 | critic_loss : 50.640
+Tot_step: 686359 	 | Episode: 2500 	 | Time: 1000.00 	 | Reward : 5155.146 	 | actor_loss : -332.321 	 | critic_loss : 49.833
+Tot_step: 706320 	 | Episode: 2520 	 | Time: 998.05 	 | Reward : 5157.863 	 | actor_loss : -337.362 	 | critic_loss : 49.160
+Tot_step: 726320 	 | Episode: 2540 	 | Time: 1000.00 	 | Reward : 5179.573 	 | actor_loss : -340.518 	 | critic_loss : 48.381
+Tot_step: 745905 	 | Episode: 2560 	 | Time: 979.25 	 | Reward : 5057.887 	 | actor_loss : -344.956 	 | critic_loss : 46.981
+Tot_step: 765905 	 | Episode: 2580 	 | Time: 1000.00 	 | Reward : 5188.537 	 | actor_loss : -348.706 	 | critic_loss : 46.643
+Tot_step: 785396 	 | Episode: 2600 	 | Time: 974.55 	 | Reward : 5067.306 	 | actor_loss : -351.135 	 | critic_loss : 46.047
+Tot_step: 805236 	 | Episode: 2620 	 | Time: 992.00 	 | Reward : 5167.481 	 | actor_loss : -354.357 	 | critic_loss : 45.450
+Tot_step: 823839 	 | Episode: 2640 	 | Time: 930.15 	 | Reward : 4805.032 	 | actor_loss : -356.816 	 | critic_loss : 44.990
+Tot_step: 843113 	 | Episode: 2660 	 | Time: 963.70 	 | Reward : 4996.887 	 | actor_loss : -358.977 	 | critic_loss : 44.001
+Tot_step: 862424 	 | Episode: 2680 	 | Time: 965.55 	 | Reward : 5007.874 	 | actor_loss : -361.065 	 | critic_loss : 43.476
+Tot_step: 882016 	 | Episode: 2700 	 | Time: 979.60 	 | Reward : 5068.043 	 | actor_loss : -364.407 	 | critic_loss : 43.379
+Tot_step: 901684 	 | Episode: 2720 	 | Time: 983.40 	 | Reward : 5073.534 	 | actor_loss : -366.612 	 | critic_loss : 43.129
+Tot_step: 921684 	 | Episode: 2740 	 | Time: 1000.00 	 | Reward : 5178.147 	 | actor_loss : -367.870 	 | critic_loss : 42.168
+Tot_step: 941419 	 | Episode: 2760 	 | Time: 986.75 	 | Reward : 5124.930 	 | actor_loss : -371.638 	 | critic_loss : 42.167
+Tot_step: 960078 	 | Episode: 2780 	 | Time: 932.95 	 | Reward : 4841.448 	 | actor_loss : -374.028 	 | critic_loss : 42.271
+Tot_step: 980078 	 | Episode: 2800 	 | Time: 1000.00 	 | Reward : 5213.976 	 | actor_loss : -374.750 	 | critic_loss : 42.124
+Tot_step: 1000078 	 | Episode: 2820 	 | Time: 1000.00 	 | Reward : 5199.889 	 | actor_loss : -374.596 	 | critic_loss : 41.904
+Tot_step: 1020078 	 | Episode: 2840 	 | Time: 1000.00 	 | Reward : 5210.250 	 | actor_loss : -378.593 	 | critic_loss : 38.422
+Tot_step: 1039427 	 | Episode: 2860 	 | Time: 967.45 	 | Reward : 5045.202 	 | actor_loss : -389.153 	 | critic_loss : 34.938
+Tot_step: 1059427 	 | Episode: 2880 	 | Time: 1000.00 	 | Reward : 5219.961 	 | actor_loss : -400.385 	 | critic_loss : 31.854
+Tot_step: 1079201 	 | Episode: 2900 	 | Time: 988.70 	 | Reward : 5184.852 	 | actor_loss : -410.540 	 | critic_loss : 28.991
+Tot_step: 1099201 	 | Episode: 2920 	 | Time: 1000.00 	 | Reward : 5319.218 	 | actor_loss : -420.325 	 | critic_loss : 26.032
+Tot_step: 1116644 	 | Episode: 2940 	 | Time: 872.15 	 | Reward : 4635.821 	 | actor_loss : -429.303 	 | critic_loss : 23.865
+Tot_step: 1134262 	 | Episode: 2960 	 | Time: 880.90 	 | Reward : 4686.146 	 | actor_loss : -436.318 	 | critic_loss : 22.649
+Tot_step: 1152275 	 | Episode: 2980 	 | Time: 900.65 	 | Reward : 4765.409 	 | actor_loss : -441.961 	 | critic_loss : 21.610
+Tot_step: 1169401 	 | Episode: 3000 	 | Time: 856.30 	 | Reward : 4540.595 	 | actor_loss : -446.051 	 | critic_loss : 26.773
+Tot_step: 34 	 | Episode: 20 	  | Reward : 114.7813642766395 	 
+Tot_step: 54 	 | Episode: 40 	  | Reward : 197.99829063724286 	 
+Tot_step: 74 	 | Episode: 60 	  | Reward : 277.63000478461953 	 
+Tot_step: 94 	 | Episode: 80 	  | Reward : 363.92573293784835 	 
+Tot_step: 114 	 | Episode: 100 	  | Reward : 451.52658220711 	 
+Tot_step: 134 	 | Episode: 120 	  | Reward : 546.6892448786691 	 
+Tot_step: 154 	 | Episode: 140 	  | Reward : 642.4074637166294 	 
+Tot_step: 174 	 | Episode: 160 	  | Reward : 737.0811868819721 	 
+Tot_step: 194 	 | Episode: 180 	  | Reward : 832.0285685072588 	 
+Tot_step: 214 	 | Episode: 200 	  | Reward : 925.5294257446016 	 
+Tot_step: 234 	 | Episode: 220 	  | Reward : 1018.0859073397714 	 
+Tot_step: 254 	 | Episode: 240 	  | Reward : 1110.9829815369399 	 
+Tot_step: 274 	 | Episode: 260 	  | Reward : 1205.5164398437241 	 
+Tot_step: 294 	 | Episode: 280 	  | Reward : 1299.4235536731499 	 
+Tot_step: 314 	 | Episode: 300 	  | Reward : 1394.1930944846272 	 
+Tot_step: 334 	 | Episode: 320 	  | Reward : 1489.0201935533198 	 
+Tot_step: 354 	 | Episode: 340 	  | Reward : 1583.145338645062 	 
+Tot_step: 374 	 | Episode: 360 	  | Reward : 1677.1236169421816 	 
+Tot_step: 394 	 | Episode: 380 	  | Reward : 1770.3092860630768 	 
+Tot_step: 414 	 | Episode: 400 	  | Reward : 1863.639595930113 	 
+Tot_step: 434 	 | Episode: 420 	  | Reward : 1958.051474367238 	 
+Tot_step: 454 	 | Episode: 440 	  | Reward : 2053.010620851846 	 
+Tot_step: 474 	 | Episode: 460 	  | Reward : 2144.2834961592953 	 
+Tot_step: 494 	 | Episode: 480 	  | Reward : 2236.5170879703 	 
+Tot_step: 514 	 | Episode: 500 	  | Reward : 2331.4941296702755 	 
+Tot_step: 534 	 | Episode: 520 	  | Reward : 2425.5284943910046 	 
+Tot_step: 554 	 | Episode: 540 	  | Reward : 2518.2297944256234 	 
+Tot_step: 574 	 | Episode: 560 	  | Reward : 2616.164056971294 	 
+Tot_step: 594 	 | Episode: 580 	  | Reward : 2713.302535695867 	 
+Tot_step: 614 	 | Episode: 600 	  | Reward : 2818.752044778329 	 
+Tot_step: 634 	 | Episode: 620 	  | Reward : 2925.433302816967 	 
+Tot_step: 654 	 | Episode: 640 	  | Reward : 3021.588012715674 	 
+Tot_step: 674 	 | Episode: 660 	  | Reward : 3118.0731065257987 	 
+Tot_step: 694 	 | Episode: 680 	  | Reward : 3217.1944064535733 	 
+Tot_step: 714 	 | Episode: 700 	  | Reward : 3312.9459346051235 	 
+Tot_step: 734 	 | Episode: 720 	  | Reward : 3404.664720582816 	 
+Tot_step: 754 	 | Episode: 740 	  | Reward : 3492.393008383258 	 
+Tot_step: 774 	 | Episode: 760 	  | Reward : 3578.5956802707706 	 
+Tot_step: 794 	 | Episode: 780 	  | Reward : 3667.9141185250746 	 
+Tot_step: 814 	 | Episode: 800 	  | Reward : 3755.432835533617 	 
+Tot_step: 834 	 | Episode: 820 	  | Reward : 3841.5761384781226 	 
+Tot_step: 854 	 | Episode: 840 	  | Reward : 3925.6098411503435 	 
+Tot_step: 874 	 | Episode: 860 	  | Reward : 4008.475510030791 	 
+Tot_step: 894 	 | Episode: 880 	  | Reward : 4092.2273606741132 	 
+Tot_step: 914 	 | Episode: 900 	  | Reward : 4177.370038642528 	 
+Tot_step: 934 	 | Episode: 920 	  | Reward : 4269.45783983646 	 
+Tot_step: 954 	 | Episode: 940 	  | Reward : 4370.954580177466 	 
+Tot_step: 974 	 | Episode: 960 	  | Reward : 4473.45286551208 	 
+Tot_step: 994 	 | Episode: 980 	  | Reward : 4572.1847497730105 	 
+Tot_step: 1014 	 | Episode: 1000 	  | Reward : 4666.272706540705 	 
+Tot_step: 406 	 | Episode: 20 	  | Reward : 91.79090014536106 	 
+Tot_step: 802 	 | Episode: 40 	  | Reward : 91.13497543455279 	 
+Tot_step: 1096 	 | Episode: 60 	  | Reward : 69.39803218464021 	 
+Tot_step: 1373 	 | Episode: 80 	  | Reward : 65.46460946529906 	 
+Tot_step: 1652 	 | Episode: 100 	  | Reward : 65.96046230911489 	 
+Tot_step: 1935 	 | Episode: 120 	  | Reward : 66.91401691195585 	 
+Tot_step: 2239 	 | Episode: 140 	  | Reward : 71.29829558059934 	 
+Tot_step: 364 	 | Episode: 20 	  | Reward : 86.12976342654441 	 
+Tot_step: 713 	 | Episode: 40 	  | Reward : 80.83217755822027 	 
+Tot_step: 1009 	 | Episode: 60 	  | Reward : 69.94800715098526 	 
+Tot_step: 1293 	 | Episode: 80 	  | Reward : 67.12153288403007 	 
+Tot_step: 1735 	 | Episode: 100 	  | Reward : 103.87393222132046 	 
+Tot_step: 2059 	 | Episode: 120 	  | Reward : 76.24940479648762 	 
+Tot_step: 2520 	 | Episode: 140 	  | Reward : 107.28630163033472 	 
+Tot_step: 2848 	 | Episode: 160 	  | Reward : 79.17520404717331 	 
+Tot_step: 3130 	 | Episode: 180 	  | Reward : 66.68760782735505 	 
+Tot_step: 3445 	 | Episode: 200 	  | Reward : 74.33265207576554 	 
+Tot_step: 3972 	 | Episode: 220 	  | Reward : 127.84524411218521 	 
+Tot_step: 4361 	 | Episode: 240 	  | Reward : 91.98105395910908 	 
+Tot_step: 4703 	 | Episode: 260 	  | Reward : 81.57740731441096 	 
+Tot_step: 5022 	 | Episode: 280 	  | Reward : 75.47572633862224 	 
+Tot_step: 5325 	 | Episode: 300 	  | Reward : 71.61742878715225 	 
+Tot_step: 5625 	 | Episode: 320 	  | Reward : 70.87212177893169 	 
+Tot_step: 6031 	 | Episode: 340 	  | Reward : 97.3991597038983 	 
+Tot_step: 6328 	 | Episode: 360 	  | Reward : 70.36638939550576 	 
+Tot_step: 6629 	 | Episode: 380 	  | Reward : 71.15968416319751 	 
+Tot_step: 6917 	 | Episode: 400 	  | Reward : 67.29244894500064 	 
+Tot_step: 7209 	 | Episode: 420 	  | Reward : 68.75997086899709 	 
+Tot_step: 7508 	 | Episode: 440 	  | Reward : 70.7010860737058 	 
+Tot_step: 7922 	 | Episode: 460 	  | Reward : 99.08547789703456 	 
+Tot_step: 8281 	 | Episode: 480 	  | Reward : 86.04174851631633 	 
+Tot_step: 8583 	 | Episode: 500 	  | Reward : 71.59799727536262 	 
+Tot_step: 8881 	 | Episode: 520 	  | Reward : 70.44775233053244 	 
+Tot_step: 9163 	 | Episode: 540 	  | Reward : 66.57793641282649 	 
+Tot_step: 9449 	 | Episode: 560 	  | Reward : 68.01484651941202 	 
+Tot_step: 9836 	 | Episode: 580 	  | Reward : 93.3221147831376 	 
+Tot_step: 10137 	 | Episode: 600 	  | Reward : 71.92795310143566 	 
+Tot_step: 10427 	 | Episode: 620 	  | Reward : 68.4838764056284 	 
+Tot_step: 10841 	 | Episode: 640 	  | Reward : 103.08726486307246 	 
+Tot_step: 11127 	 | Episode: 660 	  | Reward : 68.0312034629392 	 
+Tot_step: 11395 	 | Episode: 680 	  | Reward : 63.33948998277019 	 
+Tot_step: 11781 	 | Episode: 700 	  | Reward : 89.69914270949974 	 
+Tot_step: 12153 	 | Episode: 720 	  | Reward : 87.57727892942327 	 
+Tot_step: 12450 	 | Episode: 740 	  | Reward : 70.19009149416938 	 
+Tot_step: 12937 	 | Episode: 760 	  | Reward : 120.91139277168853 	 
+Tot_step: 13243 	 | Episode: 780 	  | Reward : 71.9907682804554 	 
+Tot_step: 13724 	 | Episode: 800 	  | Reward : 117.74597276248649 	 
+Tot_step: 14086 	 | Episode: 820 	  | Reward : 87.74202515057536 	 
+Tot_step: 14560 	 | Episode: 840 	  | Reward : 113.11935846241352 	 
+Tot_step: 15000 	 | Episode: 860 	  | Reward : 103.45888475645668 	 
+Tot_step: 15339 	 | Episode: 880 	  | Reward : 81.5140931518177 	 
+Tot_step: 15633 	 | Episode: 900 	  | Reward : 69.50847700468516 	 
+Tot_step: 15941 	 | Episode: 920 	  | Reward : 72.81978697350972 	 
+Tot_step: 16306 	 | Episode: 940 	  | Reward : 86.64974995582405 	 
+Tot_step: 16678 	 | Episode: 960 	  | Reward : 87.4347245238896 	 
+Tot_step: 17254 	 | Episode: 980 	  | Reward : 134.28425555308687 	 
+Tot_step: 17612 	 | Episode: 1000 	  | Reward : 85.08650473392326 	 
+Tot_step: 463 	 | Episode: 20 	  | Reward : 105.51299685932176 	 
+Tot_step: 848 	 | Episode: 40 	  | Reward : 94.40193556607298 	 
+Tot_step: 1155 	 | Episode: 60 	  | Reward : 73.00885739415786 	 
+Tot_step: 1429 	 | Episode: 80 	  | Reward : 64.7912420780553 	 
+Tot_step: 15886 	 | Episode: 20 	  | Reward : 4150.7580195795945 	 
+Tot_step: 27492 	 | Episode: 40 	  | Reward : 3039.7425614293343 	 
+Tot_step: 37147 	 | Episode: 60 	  | Reward : 2492.8971636803044 	 
+Tot_step: 51689 	 | Episode: 80 	  | Reward : 3803.467381052977 	 
+Tot_step: 67220 	 | Episode: 100 	  | Reward : 4089.8335680635164 	 
+Tot_step: 97053 	 | Episode: 120 	  | Reward : 7823.1242331492585 	 
+Tot_step: 144646 	 | Episode: 140 	  | Reward : 12574.078670391984 	 
+Tot_step: 165005 	 | Episode: 160 	  | Reward : 5390.9655697705675 	 
+Tot_step: 179465 	 | Episode: 180 	  | Reward : 3800.2297380593855 	 
+Tot_step: 206533 	 | Episode: 200 	  | Reward : 7137.693732393986 	 
+Tot_step: 283206 	 | Episode: 220 	  | Reward : 20303.340867325773 	 
+Tot_step: 333157 	 | Episode: 240 	  | Reward : 13117.0630974006 	 
+Tot_step: 399730 	 | Episode: 260 	  | Reward : 17467.443404884314 	 
+Tot_step: 464634 	 | Episode: 280 	  | Reward : 17054.035305343612 	 
+Tot_step: 596729 	 | Episode: 300 	  | Reward : 35046.88269481802 	 
+Tot_step: 763964 	 | Episode: 320 	  | Reward : 44382.50115190286 	 
+Tot_step: 1034380 	 | Episode: 340 	  | Reward : 72009.8636819789 	 
