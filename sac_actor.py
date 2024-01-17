@@ -4,9 +4,16 @@ import numpy as np
 import torch.optim as optim
 import math
 from dynamicsynapse import DynamicSynapse
-def closure(r):
+from Adapter import RangeAdapter
+from collections import deque
+import dill
+
+adapter = RangeAdapter.RangeAdapter()
+def closure(r, dt):
     def a():
-        return r*0.1
+        out = adapter.step_dynamics(dt, r)
+        adapter.update()
+        return out
     return a
 # continuous action space
 class Actor(nn.Module):
@@ -18,7 +25,10 @@ class Actor(nn.Module):
         self.lr = lr
         self.device = device
         self.action_bound = action_bound
-
+        self.last_episode = False
+        self.Trace = {"name": deque(),
+                        "weight":deque(),
+                      "gradient": deque()}
         self.k = (action_bound[1]-action_bound[0])/2
 
         self.intermediate_dim_list = [state_dim] + hidden_dim
@@ -26,12 +36,13 @@ class Actor(nn.Module):
         self.layer_intermediate = nn.ModuleList(
             [nn.Linear(dim_in, dim_out) for dim_in, dim_out in zip(self.intermediate_dim_list[:-1], self.intermediate_dim_list[1:])]
         )
-        
+        #[376,256], [256, 256]
        
         self.mu_log_std_layer = nn.Linear(self.intermediate_dim_list[-1], 2*self.action_dim)
 
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
-        self.optimizer_dynamic = DynamicSynapse(self.parameters(), lr=self.lr, amp=0.01, period=4000)
+        self.amp = 0.3
+        self.optimizer_dynamic = DynamicSynapse(self.parameters(), lr=self.lr, amp=self.amp, period=4000)
         self.leak_relu = nn.LeakyReLU()
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
@@ -88,6 +99,7 @@ class Actor(nn.Module):
             action = mu.detach().cpu().numpy() * self.k
 
         return action      
+        
 
     def learn(self, log_probs, Q_min, alpha):
 
@@ -95,10 +107,19 @@ class Actor(nn.Module):
 
         self.optimizer.zero_grad()
         loss.backward()
+        if self.last_episode == True:
+            for name, param in self.named_parameters():
+                if "weight" in name or "bias" in name:
+                    self.Trace["name"].append(name)
+                    self.Trace["weight"].append(param.data)
+                    self.Trace["gradient"].append(param.grad)
+            with open('trace_gradient.pkl', 'wb') as f:
+                dill.dump(self.Trace, f) 
+                    # print(f"name: {name}, weight: {param.data}, gradient: {param.grad}")
         # torch.nn.utils.clip_grad_norm_(self.parameters(), 1.0)
         self.optimizer.step()
 
         return loss.item()
     
     def learn_dynamic(self, r):
-        self.optimizer_dynamic.step(closure=closure(r))
+        self.optimizer_dynamic.step(closure=closure(r, dt=15)) 

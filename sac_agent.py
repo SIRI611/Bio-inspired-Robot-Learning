@@ -19,11 +19,11 @@ NUM_LEARN = 1           # number of learning
 NUM_TIME_STEP = 1       # every NUM_TIME_STEP do update
 LR_ACTOR = 3e-4         # learning rate of the actor 
 LR_CRITIC = 3e-4        # learning rate of the critic
-RANDOM_STEP = 10000     # number of random step
+RANDOM_STEP = 100 #10000    # number of random step
 
 # continuous action space
 class Agent(nn.Module):
-    def __init__(self, env, device, buffer_size=BUFFER_SIZE, reward_scale=REWARD_SCALE, batch_size=256, gamma=0.99, lr_actor=LR_ACTOR, lr_critic=LR_CRITIC, print_period=20, write_mode=True, save_period=1000000):
+    def __init__(self, env, device, buffer_size=BUFFER_SIZE, reward_scale=REWARD_SCALE, batch_size=256, gamma=0.99, lr_actor=LR_ACTOR, lr_critic=LR_CRITIC, print_period=20, write_mode=True, save_period=100000):
         super(Agent, self).__init__()
         
         self.gamma = gamma
@@ -89,7 +89,7 @@ class Agent(nn.Module):
             self.load_state_dict(torch.load(self.save_model_path + 'humanoid_v4_sac.pth'))
         else:
             self.load_state_dict(torch.load(path))
-    def train(self, max_episode_num=1000, max_time=1000):
+    def train(self, max_episode_num=100000, max_time=1000):
         
         self.my_print('######################### Start train #########################')
         self.episode_rewards = []
@@ -104,6 +104,8 @@ class Agent(nn.Module):
         ts = []
 
         for episode_idx in range(max_episode_num):
+            if episode_idx == max_episode_num-1:
+                self.actor.last_episode = True
             state = self.env.reset()[0]
             episode_reward = 0.
             temp_critic_loss_list = []
@@ -169,11 +171,10 @@ class Agent(nn.Module):
 
                 self.total_step += 1
 
-                if self.total_step % self.save_period == 0:
-                    self.save_model()
+                # if self.total_step % self.save_period == 0:
+                #     self.save_model()
                 
                 if done: break
-
 
             ts.append(t)
             self.tot_steps.append(self.total_step)
@@ -196,3 +197,5 @@ class Agent(nn.Module):
                     self.writer.add_scalars('Alpha/alpha', alpha_dict, self.total_step)
 
                 ts = []
+
+        self.save_model()

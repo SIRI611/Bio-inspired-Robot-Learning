@@ -11,7 +11,7 @@ class DynamicSynapse(Optimizer):
 
     def __init__(self, params, lr=1e-3, period=None, t_in_period=None, period_var=0.1, amp=1,
                  weight_centre_update_rate=1,
-                 weight_oscillate_decay=1e-2, dt=0.5, oscillating=True, using_range_adapter=False, plot_reward=True,
+                 weight_oscillate_decay=1e-2, dt=15, oscillating=True, using_range_adapter=False, plot_reward=True,
                  range_adapter_warmup_time=0):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -121,7 +121,60 @@ class DynamicSynapse(Optimizer):
             if not group['oscillating']:
                 continue
 
-            for p in group['params']:
+            # for p in group['params']:
+
+            #     state = self.state[p]
+
+            #     # State initialization
+            #     if len(state) == 0:
+            #         state['period_centre'], state['period'], state['t_in_period'], state['period_var'], \
+            #         state['amp'], state['weight_centre'], state['weight_centre_update_rate'], \
+            #         state['weight'], state['weight_oscilate_decay'], \
+            #         state['zero_cross'], state['time'] \
+            #             = self._init_states(p, period=group['period'], t_in_period=group['t_in_period'],
+            #                                 period_var=group['period_var'],
+            #                                 amp=group['amp'],
+            #                                 weighter_centre_update_rate=group['weight_centre_update_rate'],
+            #                                 weighter_oscillate_decay=group['weight_oscillate_decay'],
+            #                                 oscillating=group['oscillating'])
+
+            #     period_centre, period, t_in_period, period_var, \
+            #     amp, weight_centre, weight_centre_update_rate, \
+            #     weight, weight_oscilate_decay, \
+            #     zero_cross, time \
+            #         = state['period_centre'], state['period'], state['t_in_period'], state['period_var'], \
+            #           state['amp'], state['weight_centre'], state['weight_centre_update_rate'], \
+            #           state['weight'], state['weight_oscilate_decay'], \
+            #           state['zero_cross'], state['time']
+
+            #     time += group['dt']
+            #     t_in_period += group['dt']
+
+            #     # weight = weight_centre *(1+ amp * torch.sin(t_in_period / period * 2 * math.pi))
+            #     weight = weight_centre + amp * torch.sin(t_in_period / period * 2 * math.pi)
+            #     # weight_centre_var = (weight - weight_centre) \
+            #     #                          * modulator_amount_osci * weight_centre_update_rate * group['dt'] * group['lr']
+            #     weight_centre_var = (weight - weight_centre) \
+            #                         * torch.tanh(modulator_amount_osci * weight_centre_update_rate * group['dt'] * group['lr'])
+            #     # if debug:
+            #     #     assert not torch.any(torch.isnan(weight_centre)), "weighter_centre has nan" + \
+            #     #         str(torch.any(torch.isnan(weight_centre))) + "weight_centre_var=" + \
+            #     #         str(weight_centre_var) + "\nweighter_centre" + str(weight_centre)
+            #     #     assert not torch.any(torch.isnan(weight_centre_var)), "weight_centre_var has nan" + \
+            #     #         "weight_centre_var=" + str(weight_centre_var) + \
+            #     #          "\nweighter_centre" + str(weight_centre)
+            #     weight_centre += weight_centre_var
+            #     amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
+            #     zero_cross = torch.logical_and(torch.less(p, weight_centre),
+            #                                    torch.greater_equal(weight, weight_centre))
+            #     if torch.any(zero_cross):
+            #         t_in_period[zero_cross] = t_in_period[zero_cross] % period[zero_cross]
+            #         period[zero_cross] = torch.normal(mean=period_centre[zero_cross],
+            #                                                  std=period_centre[zero_cross] * period_var[zero_cross])
+            #     p.data = weight.data
+            # self.amp = state['amp']
+            for i in range(len(group['params'])):
+                p = group['params'][i]
 
                 state = self.state[p]
 
@@ -133,7 +186,7 @@ class DynamicSynapse(Optimizer):
                     state['zero_cross'], state['time'] \
                         = self._init_states(p, period=group['period'], t_in_period=group['t_in_period'],
                                             period_var=group['period_var'],
-                                            amp=group['amp'],
+                                            amp=group['amp'][i],
                                             weighter_centre_update_rate=group['weight_centre_update_rate'],
                                             weighter_oscillate_decay=group['weight_oscillate_decay'],
                                             oscillating=group['oscillating'])
