@@ -160,7 +160,7 @@ class SAC(OffPolicyAlgorithm):
         self.step = 0
         self.total_step = total_step
         self.trace_num = trace_num
-        self.trace_path = "trace_"+env_name+"_"+str(total_step)+".pkl"
+        self.trace_path = "trace/trace_"+env_name+"_"+str(total_step)+".pkl"
 
         if _init_setup_model:
             self._setup_model()

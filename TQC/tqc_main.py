@@ -20,7 +20,7 @@ class Config():
     def __init__(self) -> None:
         self.k1 = 0.1
         self.k2 = 0.002
-        self.total_step = 1000
+        self.total_step = 2e6
         self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 3000
@@ -29,7 +29,22 @@ class Config():
         self.dt = 15
         self.num_test = 10
         self.env_name="humanoid_tqc"
+        #TODO change path
         self.logpath = "tqc_humanoid_tensorboard"
+        self.gradient_path = "save_gradient/ant_sac_max_gradient_600.pkl"
+        self.weight_path = "save_weight/ant_sac_weight.pkl"
+
+def calculate_amp_init(gradient_path, weight_path, k1, k2):
+    with open(gradient_path, "rb") as f:
+        gradient = dill.load(f)
+    with open(weight_path, "rb") as f:
+        weight = dill.load(f)
+    # gm = preprocessing(gradient)
+    # print(gradient)
+    gn = [torch.abs(g * k1) for g in gradient]
+    wn = [torch.abs(w * k2) for w in weight]
+    amp_init = [gn[i] + wn[i] for i in range(len(gn))]
+    return amp_init
 
 para = Config()
 episode_rewards = list()
@@ -37,14 +52,14 @@ env = gym.make(para.env, render_mode="human")
 
 
 if para.is_train:
-    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=100, tensorboard_log=para.logpath)
+    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=10000, tensorboard_log=para.logpath)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
-    model.save("{}_{}.pkl".format(para.env_name, para.total_step))
+    model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     del model # remove to demonstrate saving and loading
 
 else:
-    model = TQC.load("{}_{}.pkl".format(para.env_name, para.total_step))
+    model = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
 
     if not para.is_continue_train:
         for _ in range(para.num_test):    
@@ -63,7 +78,8 @@ else:
             episode_rewards.append(episode_reward)
 
     if para.is_continue_train:
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=model.actor.lr, amp=1, period=4000, dt=para.dt)
+        amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=model.actor.lr, amp=amp_init, period=4000, dt=para.dt)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0

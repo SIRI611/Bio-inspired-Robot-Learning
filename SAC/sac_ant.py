@@ -14,34 +14,53 @@ def preprocessing(data):
     for li in data:
         li = (li - torch.mean(li)) / torch.std(li)
     return data
+
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.1
         self.k2 = 0.002
-        self.total_step = 1e6
-        self.is_train = True
-        self.is_continue_train = False
+        self.total_step = 1000000
+        self.is_train = False
+        self.is_continue_train = True
         self.continue_train_episodes = 3000
         self.modelfilepath = "sac_ant.pkl"
         self.env = "Ant-v4"
         self.dt = 15
         self.num_test = 10
         self.env_name="ant_sac"
-        self.logpath = "sac_ant_tensorboard/"
+        self.logpath = "tensorboard/sac_ant_tensorboard/"
+        self.gradient_path = "save_gradient/ant_sac_max_gradient_600.pkl"
+        self.weight_path = "save_weight/ant_sac_weight.pkl"
+
+
+
+def calculate_amp_init(gradient_path, weight_path, k1, k2):
+    with open(gradient_path, "rb") as f:
+        gradient = dill.load(f)
+    with open(weight_path, "rb") as f:
+        weight = dill.load(f)
+    # gm = preprocessing(gradient)
+    # print(gradient)
+    gn = [torch.abs(g * k1) for g in gradient]
+    wn = [torch.abs(w * k2) for w in weight]
+    amp_init = [gn[i] + wn[i] for i in range(len(gn))]
+    return amp_init
 
 para = Config()
 episode_rewards = list()
 env = gym.make(para.env, render_mode="human")
+
 if para.is_train:
 
     model = SAC("MlpPolicy", env, verbose=1, total_step=para.total_step, env_name=para.env_name, tensorboard_log=para.logpath, learning_starts=10000)
     model.learn(total_timesteps=para.total_step, log_interval=4)
-    model.save("{}_{}.pkl".format(para.env_name, para.total_step))
+    model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
 
 # del model # remove to demonstrate saving and loading
 else:
-    model = SAC.load("{}_{}.pkl".format(para.env_name, para.total_step))
+    model = SAC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
 
     if not para.is_continue_train:
         for _ in range(para.num_test):    
@@ -56,10 +75,12 @@ else:
                 episode_reward += reward
                 if done:
                     break 
+            print(episode_reward)
             episode_rewards.append(episode_reward)
 
     if para.is_continue_train:
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=model.actor.lr, amp=None, period=4000, dt=para.dt)
+        amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=model.actor.lr, amp=amp_init, period=4000, dt=para.dt)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0
