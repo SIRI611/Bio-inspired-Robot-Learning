@@ -1,8 +1,8 @@
-### Stable Baselines 3 pre-train DRL Models
+## Stable Baselines 3 pre-train DRL Models
 
 Our repo implements three DRL algorisms: **SAC, TD3 and TQC**, we use these three algorisms  train Mujoco tasks: **Humanoid-v4, Hopper-v4, HalfCheetah-v4, Ant-v4, and Walker2d-v4**
 
-#### Structure of our repo<br>
+### Structure of our repo<br>
 
 <br>├── SAC/
 	   ├── save_gradient<br>			  ├── ant_sac_max_gradient_600.pkl<br>			  └── $\dots$<br>	   └── save_weight<br>			  ├── ant_sac_max_weight.pkl<br>			  └── $\dots$<br>	   └── save_model<br>			  ├── ant_sac_1000000.pkl<br>		  	└── $\dots$<br>	   └── trace<br>			  ├── trace_ant_sac_1000000.pkl<br>			  └── $\dots$<br>	   └── tensorboard<br>			  ├── sac_ant_tensorboard<br>			  └── $\dots$<br>	   └── calculate_trace.py<br>	   └── dynamicsynapse.py<br>	   └── policies.py<br>	   └── sac.py<br>	   └── sac_main.py<br>
@@ -11,9 +11,9 @@ Our repo implements three DRL algorisms: **SAC, TD3 and TQC**, we use these thre
 ├── TQC/<br>
        ├── $\cdots$
 
-#### Instructions
+### Instructions
 
-##### Pre-train model with stable-baseline3
+#### Pre-train model with stable-baseline3
 
 Let’s take TD3 model and Ant-v4 task for an example!
 
@@ -38,7 +38,7 @@ Next, run td3_main.py:
 python TD3/td3_main.py
 ```
 
-##### Calculate gradient and weight
+#### Calculate gradient and weight
 
 Firstly, please confirm that the trace file has been saved in the corresponding algorithm's "trace" folder.
 
@@ -60,7 +60,7 @@ Next, run calculate_trace.py:
 python TD3/calculate_trace.py
 ```
 
-##### Train pre-train model with dynamic synapse
+#### Train pre-train model with dynamic synapse
 
 Configure the parameters, in the td3_main.py, set **Config.is_train** as False and **Config.is_continue_train** as True. and then run the td3_main.py:
 
