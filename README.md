@@ -5,7 +5,26 @@ Our repo implements three DRL algorisms: **SAC, TD3 and TQC**, we use these thre
 ### Structure of our repo<br>
 
 <br>├── SAC/
-	   ├── save_gradient<br>			  ├── ant_sac_max_gradient_600.pkl<br>			  └── $\dots$<br>	   └── save_weight<br>			  ├── ant_sac_max_weight.pkl<br>			  └── $\dots$<br>	   └── save_model<br>			  ├── ant_sac_1000000.pkl<br>		  	└── $\dots$<br>	   └── trace<br>			  ├── trace_ant_sac_1000000.pkl<br>			  └── $\dots$<br>	   └── tensorboard<br>			  ├── sac_ant_tensorboard<br>			  └── $\dots$<br>	   └── calculate_trace.py<br>	   └── dynamicsynapse.py<br>	   └── policies.py<br>	   └── sac.py<br>	   └── sac_main.py<br>
+	├── save_gradient<br>			  
+		├── ant_sac_max_gradient_600.pkl			  
+ 		└── $\dots$   
+	└── save_weight			  
+		├── ant_sac_max_weight.pkl			  
+ 		└── $\dots$<br>	   
+	└── save_model<br>			  
+		├── ant_sac_1000000.pkl<br>		  	
+ 		└── $\dots$<br>	   
+	└── trace<br>			  
+		├── trace_ant_sac_1000000.pkl<br>			  
+ 		└── $\dots$<br>	   
+	└── tensorboard<br>			 
+		├── sac_ant_tensorboard<br>			 
+ 		└── $\dots$<br>	   
+	└── calculate_trace.py<br>	   
+	└── dynamicsynapse.py<br>	   
+	└── policies.py<br>	   
+	└── sac.py<br>	   
+	└── sac_main.py<br>
 ├── TD3/<br>
        ├── $\cdots$<br>
 ├── TQC/<br>
