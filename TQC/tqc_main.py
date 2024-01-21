@@ -30,7 +30,7 @@ class Config():
         self.num_test = 10
         self.env_name="humanoid_tqc"
         #TODO change path
-        self.logpath = "tqc_humanoid_tensorboard"
+        self.logpath = "tensorboard/tqc_humanoid_tensorboard"
         self.gradient_path = "save_gradient/ant_sac_max_gradient_600.pkl"
         self.weight_path = "save_weight/ant_sac_weight.pkl"
 
@@ -48,11 +48,11 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 
 
 if para.is_train:
-    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=10000, tensorboard_log=para.logpath)
+    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=10000, tensorboard_log=para.logpath, verbose=1)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
     model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
