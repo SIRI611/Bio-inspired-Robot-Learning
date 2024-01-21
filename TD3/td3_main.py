@@ -20,19 +20,19 @@ class Config():
     def __init__(self) -> None:
         self.k1 = 0.1
         self.k2 = 0.002
-        self.total_step = 2e3
+        self.total_step = 1e6
         self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 3000
         # self.modelfilepath = "td3_humanoid.pkl"
-        self.env = "Humanoid-v4"
+        self.env = "Ant-v4"
         self.dt = 15
         self.num_test = 10
         self.env_name="humanoid_td3"
         #TODO change path
-        self.logpath = "td3_humanoid_tensorboard"
-        self.gradient_path = "save_gradient/humanoid_td3_max_gradient_600.pkl"
-        self.weight_path = "save_weight/humanoid_td3_weight.pkl"
+        self.logpath = "tensorboard/td3_ant_tensorboard"
+        self.gradient_path = "save_gradient/ant_td3_max_gradient_600.pkl"
+        self.weight_path = "save_weight/ant_td3_weight.pkl"
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
@@ -48,7 +48,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode="human")
+# env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 
 
 if para.is_train:
@@ -57,7 +58,7 @@ if para.is_train:
                 learning_rate=1e-3,batch_size=256,
                 verbose=1,total_step=para.total_step, 
                 env_name=para.env_name, tensorboard_log=para.logpath, 
-                learning_starts=1000)
+                learning_starts=10000)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
     model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
