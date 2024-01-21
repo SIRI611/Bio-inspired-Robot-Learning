@@ -207,8 +207,12 @@ class TD3(OffPolicyAlgorithm):
                 # Optimize the actor
                 self.actor.optimizer.zero_grad()
                 actor_loss.backward()
-
+                
+                print("step", self.step, "\n", "total_step", self.total_step)
+                
                 if self.step >= self.total_step - self.trace_num - self.learning_starts:
+                # if self.step >= self.total_step - self.trace_num:
+                    # print("append data!")
                     for name, param in self.actor.named_parameters():
                         if "weight" in name or "bias" in name:
                             self.actor.Trace["name"].append(name)
@@ -221,6 +225,7 @@ class TD3(OffPolicyAlgorithm):
                             self.actor_target.Trace["gradient"].append(param.grad)
 
                 if self.step == self.total_step - self.learning_starts:
+                    # print("load data!")
                     with open("actor_"+self.trace_path, 'wb') as f:
                         dill.dump(self.actor.Trace, f)
                     with open("target_actor_"+self.trace_path, "wb") as f:
