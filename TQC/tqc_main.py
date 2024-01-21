@@ -52,7 +52,7 @@ env = gym.make(para.env, render_mode="human")
 
 
 if para.is_train:
-    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=10000, tensorboard_log=para.logpath)
+    model = TQC("MlpPolicy", env, total_step=para.total_step, learning_starts=10000, tensorboard_log=para.logpath, verbose=1)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
     model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
