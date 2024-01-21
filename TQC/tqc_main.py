@@ -48,7 +48,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 
 
 if para.is_train:
