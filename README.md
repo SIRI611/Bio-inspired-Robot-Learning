@@ -59,6 +59,7 @@ python calculate_trace.py
 Configure the parameters, in the td3_main.py, set **Config.is_train** as False and **Config.is_continue_train** as True. and then run the td3_main.py:
 
 ```shell
-python TD3/td3_main.py
+cd TD3/
+python td3_main.py
 ```
 
