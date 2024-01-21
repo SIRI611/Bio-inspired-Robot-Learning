@@ -27,7 +27,8 @@ class Config():
 Next, run td3_main.py:
 
 ```shell
-python TD3/td3_main.py
+cd TD3/
+python td3_main.py
 ```
 
 #### Calculate gradient and weight
@@ -49,7 +50,8 @@ class Config():
 Next, run calculate_trace.py:
 
 ```shell
-python TD3/calculate_trace.py
+cd TD3/
+python calculate_trace.py
 ```
 
 #### Train pre-train model with dynamic synapse
