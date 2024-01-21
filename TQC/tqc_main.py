@@ -30,7 +30,7 @@ class Config():
         self.num_test = 10
         self.env_name="humanoid_tqc"
         #TODO change path
-        self.logpath = "tqc_humanoid_tensorboard"
+        self.logpath = "tensorboard/tqc_humanoid_tensorboard"
         self.gradient_path = "save_gradient/ant_sac_max_gradient_600.pkl"
         self.weight_path = "save_weight/ant_sac_weight.pkl"
 
