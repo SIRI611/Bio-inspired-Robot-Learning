@@ -283,7 +283,7 @@ class TQC(OffPolicyAlgorithm):
             self.actor.optimizer.zero_grad()
             actor_loss.backward()
             # TODO
-            if self.step >= self.total_step - self.trace_num:
+            if self.step >= self.total_step - self.trace_num - self.learning_starts:
                 for name, param in self.actor.named_parameters():
                     if "weight" in name or "bias" in name:
                         self.actor.Trace["name"].append(name)
