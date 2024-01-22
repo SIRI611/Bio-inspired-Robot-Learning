@@ -18,8 +18,8 @@ def preprocessing(data):
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
 class Config():
     def __init__(self) -> None:
-        self.k1 = 0.1
-        self.k2 = 0.002
+        self.k1 = 0.001
+        self.k2 = 0.00002
         self.total_step = 1e6
         self.is_train = False
         self.is_continue_train = True
@@ -88,12 +88,15 @@ else:
                     break
             print(episode_reward) 
             episode_rewards.append(episode_reward)
+        print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
         model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=4000, dt=para.dt,
-                                                       a=1e-3,
-                                                       b=-1e-3)
+                                                       a=1e-5,
+                                                       b=-1e-5,
+                                                       alpha_0=-0.05,
+                                                       alpha_1=0.05)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0
@@ -142,8 +145,8 @@ else:
             
             print("oscillate weight center:")
             print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_centre'])
-            print("weight_oscillate_decay:")
-            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_oscilate_decay'])
+            # print("weight_oscillate_decay:")
+            # print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_oscilate_decay'])
             print("oscillate amp:")
             print(model.actor.optimizer_dynamic.state_dict()['state'][5]['amp'])
             print("episode:", episode_idx, "\nepisode_reward:", episode_reward, "\n")  
