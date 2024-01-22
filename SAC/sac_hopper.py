@@ -8,7 +8,7 @@ np.set_printoptions(threshold=np.inf)
 # range_adapter.init_recording()
 from dynamicsynapse import DynamicSynapse
 from Adapter.RangeAdapter import RangeAdapter
-
+from collections import deque
 def preprocessing(data):
     # torch.abs(data)
     for li in data:
@@ -29,8 +29,8 @@ class Config():
         self.env_name="hopper_sac"
         # TODO change path
         self.logpath = "tensorboard/sac_hopper_tensorboard/"
-        self.gradient_path = "save_gradient/ant_sac_max_gradient_600.pkl"
-        self.weight_path = "save_weight/ant_sac_weight.pkl"
+        self.gradient_path = "save_gradient/hopper_sac_max_gradient_600.pkl"
+        self.weight_path = "save_weight/hopper_sac_weight.pkl"
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
@@ -56,7 +56,7 @@ if para.is_train:
 # del model # remove to demonstrate saving and loading
 else:
     model = SAC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
-
+    reward_list = deque()
     if not para.is_continue_train:
         for _ in range(para.num_test):    
             state = env.reset()[0]
@@ -86,12 +86,19 @@ else:
                 state, reward, done, _, _ = env.step(action)
                 # print(done)
 
-                # reward = range_adapter.step_dynamics(para.dt, reward)
-                # trace_reward.append(reward)
-                # range_adapter.recording()
-                # range_adapter.update()
+                if len(reward_list) > 0:
+                    sum_ = sum(reward_list)
+                    reward_ = reward - (sum_/len(reward_list))
+                    reward_list.append(reward)
+                    if len(reward_list) > 50:
+                        reward_list.popleft()
+                        
+                if len(reward_list) == 0:
+                    reward_ = reward
+                    reward_list.append(reward)
+                print(reward_)
 
-                model.actor.learn_dynamic(reward)
+                model.actor.learn_dynamic(reward_)
                 episode_reward += reward
                 
                 # if step == 10000:

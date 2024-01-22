@@ -20,9 +20,9 @@ from stable_baselines3.common.type_aliases import Schedule
 adapter = RangeAdapter()
 def closure(r, dt):
     def a():
-        out = adapter.step_dynamics(dt, r)
-        adapter.update()
-        return out
+        # out = adapter.step_dynamics(dt, r)
+        # adapter.update()
+        return r
     return a
 
 class Actor(BasePolicy):
