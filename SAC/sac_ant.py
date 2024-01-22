@@ -25,6 +25,8 @@ class Config():
         self.is_train = False
         self.is_continue_train = True
         self.continue_train_episodes = 3000
+        self.average_a = 0.9        # 10
+        self.average_b = 0.98       # 50
         self.modelfilepath = "sac_ant.pkl"
         self.env = "Ant-v4"
         self.dt = 15
@@ -62,7 +64,9 @@ if para.is_train:
 else:
     model = SAC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     reward_list = deque()
-
+    reward_average = 0
+    reward_diff = 0
+    reward_diff_average = 0     #alpha
     if not para.is_continue_train:
         for _ in range(para.num_test):    
             state = env.reset()[0]
@@ -75,9 +79,10 @@ else:
                 state, reward, done, _, _ = env.step(action)
                 episode_reward += reward
                 if done:
-                    break 
-            print(episode_reward)
+                    break
+            print(episode_reward) 
             episode_rewards.append(episode_reward)
+        print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
@@ -86,28 +91,38 @@ else:
             state = env.reset()[0]
             episode_reward = 0
             step = 0
-            for _ in range(1000): 
+            for _ in range(1000):  
                 step += 1
                 action, _state = model.predict(state, deterministic=True)
-
+                # print(action)
                 state, reward, done, _, _ = env.step(action)
+                # print(done)
 
-                episode_reward += reward
-
-                if len(reward_list) > 0:
-                    sum_ = sum(reward_list)
-                    reward_ = reward - (sum_/len(reward_list))
-                    reward_list.append(reward)
-                    if len(reward_list) > 50:
-                        reward_list.popleft()
-                        
-                if len(reward_list) == 0:
-                    reward_ = reward
-                    reward_list.append(reward)
-                print(reward_)
-
-                model.actor.learn_dynamic(reward_)
+                if reward_average == 0:
+                    reward_average = reward
+                else:
+                    reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
+                    reward_diff = reward - reward_average
                 
+                reward_diff_average = para.average_b * reward_diff_average + (1 - para.average_b) * reward_diff
+                # print(reward_average)
+                # print(reward_diff_average)
+
+                # if len(reward_list) > 0:
+                #     sum_ = sum(reward_list)
+                #     reward_ = reward - (sum_/len(reward_list))
+                #     reward_list.append(reward)
+                #     if len(reward_list) > 50:
+                #         reward_list.popleft()
+                        
+                # if len(reward_list) == 0:
+                #     reward_ = reward
+                #     reward_list.append(reward)
+                # print(reward_)
+
+                # model.actor.learn_dynamic(reward_)
+                model.actor.learn_dynamic(reward_diff_average)
+                episode_reward += reward
                 
                 # if step == 10000:
                 #     plt.plot(range(10000), trace_reward, "g-")
@@ -116,8 +131,17 @@ else:
 
                 if done:
                     # print("break")
-                    break 
+                    break
+            
+            print("oscillate weight center:")
+            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_centre'])
+            print("weight_oscillate_decay:")
+            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_oscilate_decay'])
+            print("oscillate amp:")
+            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['amp'])
+            print("episode:", episode_idx, "\nepisode_reward:", episode_reward, "\n")  
             episode_rewards.append(episode_reward)
+        model.save("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
 # with open("trace.pkl", "rb") as f:
 #     trace = dill.load(f)
 # print(trace["weight"])
