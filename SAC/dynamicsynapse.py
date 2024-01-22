@@ -12,7 +12,7 @@ class DynamicSynapse(Optimizer):
     def __init__(self, params, lr=1e-3, period=None, t_in_period=None, period_var=0.1, amp=1,
                  weight_centre_update_rate=1,
                  weight_oscillate_decay=1e-2, dt=15, oscillating=True, using_range_adapter=False, plot_reward=True,
-                 range_adapter_warmup_time=0):
+                 range_adapter_warmup_time=0, alpha_0=-0.5, alpha_1=0.5, a=1, b=-1):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         defaults = dict(lr=lr,
@@ -37,6 +37,10 @@ class DynamicSynapse(Optimizer):
         self.t = 0
         self.dt = dt
         self.range_adapter_warmup_time = range_adapter_warmup_time
+        self.alpha_0 = alpha_0
+        self.alpha_1 = alpha_1
+        self.a = a
+        self.b = b
 
     @torch.no_grad()
     def _init_states(self, p, period=None, t_in_period=None, period_var=None,
@@ -93,6 +97,14 @@ class DynamicSynapse(Optimizer):
             loss = closure()
         if torch.is_tensor(loss):
             loss = loss.numpy()
+
+        if loss<self.alpha_0:
+            self.mode = 0
+        if loss<=self.alpha_1 and loss>=self.alpha_0:
+            self.mode = 1
+        if loss > self.alpha_1:
+            self.mode = 2
+        
         if self.using_range_adapter:
             modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], loss, factor_rate=0.1)
             if self.plot_reward:
@@ -217,7 +229,14 @@ class DynamicSynapse(Optimizer):
                 #         "weight_centre_var=" + str(weight_centre_var) + \
                 #          "\nweighter_centre" + str(weight_centre)
                 weight_centre += weight_centre_var
-                amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
+                if self.mode == 0:
+                    amp *= np.exp(self.b * group['dt'])
+                if self.mode == 1:
+                    amp *= np.exp(self.a * group['dt'])
+                if self.mode == 2:
+                    amp *= 1
+
+                # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
                 zero_cross = torch.logical_and(torch.less(p, weight_centre),
                                                torch.greater_equal(weight, weight_centre))
                 if torch.any(zero_cross):
