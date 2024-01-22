@@ -21,9 +21,9 @@ from collections import deque
 adapter = RangeAdapter()
 def closure(r, dt):
     def a():
-        out = adapter.step_dynamics(dt, r)
-        adapter.update()
-        return out
+        # out = adapter.step_dynamics(dt, r)
+        # adapter.update()
+        return r
     return a
 
 # CAP the standard deviation of the actor
