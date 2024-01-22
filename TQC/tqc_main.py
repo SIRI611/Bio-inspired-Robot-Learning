@@ -10,6 +10,13 @@ np.set_printoptions(threshold=np.inf)
 from dynamicsynapse import DynamicSynapse
 from Adapter.RangeAdapter import RangeAdapter
 from collections import deque
+def closure(r):
+    def a():
+        # out = adapter.step_dynamics(dt, r)
+        # adapter.update()
+        return r
+    return a
+
 def preprocessing(data):
     # torch.abs(data)
     for li in data:
@@ -24,7 +31,6 @@ class Config():
         self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 3000
-        self.lr = 1e-3
         # self.modelfilepath = "td3_humanoid.pkl"
         self.env = "Humanoid-v4"
         self.dt = 15
@@ -85,12 +91,12 @@ else:
 
     if para.is_continue_train:
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=4000, dt=para.dt)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=1e-3, amp=amp_init, period=4000, dt=para.dt)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0
             step = 0
-            for _ in range(1000):  
+            while True:  
                 step += 1
                 action, _state = model.predict(state, deterministic=True)
                 # print(action)
@@ -109,6 +115,7 @@ else:
                     reward_list.append(reward)
                 print(reward_)
 
+                # model.actor.optimizer_dynamic.step(closure=closure(reward_))
                 model.actor.learn_dynamic(reward_)
                 episode_reward += reward
                 

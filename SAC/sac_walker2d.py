@@ -23,6 +23,7 @@ class Config():
         self.total_step = 1000000
         self.is_train = False
         self.is_continue_train = False
+        self.is_continue_train = True
         self.continue_train_episodes = 3000
         # self.modelfilepath = "sac_ant.pkl"
         self.env = "Walker2d-v4"
