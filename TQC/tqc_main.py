@@ -31,6 +31,7 @@ class Config():
         self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 3000
+        self.lr = 1e-3
         # self.modelfilepath = "td3_humanoid.pkl"
         self.env = "Humanoid-v4"
         self.dt = 15
@@ -91,7 +92,7 @@ else:
 
     if para.is_continue_train:
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=1e-3, amp=amp_init, period=4000, dt=para.dt)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=4000, dt=para.dt)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0
