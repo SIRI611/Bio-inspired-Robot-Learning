@@ -106,7 +106,7 @@ class DynamicSynapse(Optimizer):
         #     modulator_amount_osci = 10
         # elif modulator_amount_osci<-10:
         #     modulator_amount_osci = -10
-        modulator_amount_osci = np.tanh(modulator_amount_osci)
+        # modulator_amount_osci = np.tanh(modulator_amount_osci)
         self.modulator_amount_osci = modulator_amount_osci
         if self.t % 100 == 99:
             if self.using_range_adapter:

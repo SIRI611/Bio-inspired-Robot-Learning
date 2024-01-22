@@ -188,6 +188,9 @@ class Actor(BasePolicy):
 
     def _predict(self, observation: PyTorchObs, deterministic: bool = False) -> th.Tensor:
         return self(observation, deterministic)
+    
+    def learn_dynamic(self, r):
+        self.optimizer_dynamic.step(closure=closure(r, dt=15)) 
 
 
 class Critic(BaseModel):

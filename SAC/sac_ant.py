@@ -23,7 +23,7 @@ class Config():
         self.k2 = 0.002
         self.total_step = 1000000
         self.is_train = False
-        self.is_continue_train = True
+        self.is_continue_train = False
         self.continue_train_episodes = 3000
         self.modelfilepath = "sac_ant.pkl"
         self.env = "Ant-v4"

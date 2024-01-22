@@ -20,7 +20,7 @@ class Config():
         self.k1 = 0.1
         self.k2 = 0.002
         self.total_step = 1e6
-        self.is_train = True
+        self.is_train = False
         self.is_continue_train = False
         self.continue_train_episodes = 3000
         self.env = "Hopper-v4"
@@ -46,7 +46,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env)
+env = gym.make(para.env, render_mode="human")
 if para.is_train:
 
     model = SAC("MlpPolicy", env, verbose=1, total_step=para.total_step, env_name=para.env_name, tensorboard_log=para.logpath, learning_starts=10000)
