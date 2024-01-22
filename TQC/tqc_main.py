@@ -10,6 +10,13 @@ np.set_printoptions(threshold=np.inf)
 from dynamicsynapse import DynamicSynapse
 from Adapter.RangeAdapter import RangeAdapter
 from collections import deque
+def closure(r):
+    def a():
+        # out = adapter.step_dynamics(dt, r)
+        # adapter.update()
+        return r
+    return a
+
 def preprocessing(data):
     # torch.abs(data)
     for li in data:
@@ -84,7 +91,7 @@ else:
 
     if para.is_continue_train:
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=model.actor.lr, amp=amp_init, period=4000, dt=para.dt)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=1e-3, amp=amp_init, period=4000, dt=para.dt)
         for episode_idx in range(para.continue_train_episodes):
             state = env.reset()[0]
             episode_reward = 0
@@ -108,6 +115,7 @@ else:
                     reward_list.append(reward)
                 print(reward_)
 
+                # model.actor.optimizer_dynamic.step(closure=closure(reward_))
                 model.actor.learn_dynamic(reward_)
                 episode_reward += reward
                 
