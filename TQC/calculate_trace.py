@@ -5,9 +5,9 @@ import torch
 class Config():
     def __init__(self) -> None:
         self.algothrim = "TQC" #"TD3", "TQC"
-        self.env_name = "walker2d_tqc"
-        self.trace_name = "trace/trace_walker2d_tqc_1000000.0.pkl"
-        self.mode = "max" #"mean", "abs_mean"
+        self.env_name = "humanoid_tqc"
+        self.trace_name = "trace/trace_humanoid_tqc_2000000.0.pkl"
+        self.mode = "mean" #"mean", "abs_mean"
         self.trace_num = 600
 
 def calculate_mean_gradient(load_data, trace_num, savepath):
