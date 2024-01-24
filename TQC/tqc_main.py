@@ -25,10 +25,10 @@ def preprocessing(data):
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
 class Config():
     def __init__(self) -> None:
-        self.k1 = 0.1
+        self.k1 = 0.01
         self.k2 = 0.002
         self.total_step = 2e6
-        self.is_train = True
+        self.is_train = False
         self.is_continue_train = False
         self.continue_train_episodes = 3000
         self.average_a = 0.9        # 10
@@ -43,6 +43,16 @@ class Config():
         self.logpath = "tensorboard/tqc_humanoid_tensorboard"
         self.gradient_path = "save_gradient/humanoid_tqc_max_gradient_600.pkl"
         self.weight_path = "save_weight/humanoid_tqc_weight.pkl"
+        self.Trace = {"step_reward": deque(),
+                      "step_reward_average": deque(),
+                      "alpha": deque(),
+                      "episode_reward":deque(),
+                      "episode_reward_average":deque(),
+                      "mu_weight_amp": deque(),
+                      "mu_weight_centre":deque(),
+                      "mu_bias_amp": deque(),
+                      "mu_bias_centre":deque()}
+        
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
@@ -58,7 +68,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env)
+env = gym.make(para.env, render_mode="human")
+
 
 
 if para.is_train:
@@ -97,6 +108,8 @@ else:
         print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
+        with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "wb") as f:
+            dill.dump(para.Trace, f)
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
         model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=4000, dt=para.dt,
                                                        a=1e-5,
@@ -104,6 +117,29 @@ else:
                                                        alpha_0=-0.05,
                                                        alpha_1=0.05)
         for episode_idx in range(para.continue_train_episodes):
+            if episode_idx % 5 == 1:
+                with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "rb") as f:
+                    data = dill.load(f)
+                data["step_reward"] += para.Trace["step_reward"]
+                data["step_reward_average"] += para.Trace["step_reward_average"]
+                data["alpha"] += para.Trace["alpha"]
+                data["episode_reward"] += para.Trace["episode_reward"]
+                data["episode_reward_average"] += para.Trace["episode_reward_average"]
+                data["mu_weight_amp"] += para.Trace["mu_weight_amp"]
+                data["mu_weight_centre"] += para.Trace["mu_weight_centre"]
+                data["mu_bias_amp"] += para.Trace["mu_bias_amp"]
+                data["mu_bias_centre"] += para.Trace["mu_bias_centre"]
+                with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "wb") as f:
+                    dill.dump(data, f)
+                para.Trace = {"step_reward": deque(),
+                      "step_reward_average": deque(),
+                      "alpha": deque(),
+                      "episode_reward":deque(),
+                      "episode_reward_average":deque(),
+                      "mu_weight_amp": deque(),
+                      "mu_weight_centre":deque(),
+                      "mu_bias_amp":deque(),
+                      "mu_bias_centre":deque()}
             state = env.reset()[0]
             episode_reward = 0
             step = 0
@@ -113,17 +149,18 @@ else:
                 # print(action)
                 state, reward, done, _, _ = env.step(action)
                 # print(done)
+                para.Trace["step_reward"].append(reward)
 
                 if reward_average == 0:
                     reward_average = reward
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
                     reward_diff = reward - reward_average
-                
+                para.Trace["step_reward_average"].append(reward_average)
                 reward_diff_average = para.average_b * reward_diff_average + (1 - para.average_b) * reward_diff
                 # print(reward_average)
                 # print(reward_diff_average)
-
+                para.Trace["alpha"].append(reward_diff_average)
                 # if len(reward_list) > 0:
                 #     sum_ = sum(reward_list)
                 #     reward_ = reward - (sum_/len(reward_list))
@@ -139,7 +176,10 @@ else:
                 # model.actor.learn_dynamic(reward_)
                 model.actor.learn_dynamic(reward_diff_average)
                 episode_reward += reward
-                
+                para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"])
+                para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"])
+                para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"])
+                para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"])
                 # if step == 10000:
                 #     plt.plot(range(10000), trace_reward, "g-")
                 #     plt.savefig("range_adapter.png")
@@ -148,7 +188,7 @@ else:
                 if done:
                     # print("break")
                     break
-            
+            para.Trace["episode_reward"].append(episode_reward)
             print("oscillate weight center:")
             print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_centre'])
             # print("weight_oscillate_decay:")
@@ -157,6 +197,7 @@ else:
             print(model.actor.optimizer_dynamic.state_dict()['state'][5]['amp'])
             print("episode:", episode_idx, "\nepisode_reward:", episode_reward, "\n")  
             episode_rewards.append(episode_reward)
+            para.Trace["episode_reward_average"].append(sum(episode_rewards)/len(episode_rewards))
         model.save("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
 # with open("trace.pkl", "rb") as f:
 #     trace = dill.load(f)

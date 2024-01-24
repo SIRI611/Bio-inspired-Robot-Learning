@@ -4,9 +4,9 @@ import torch
 
 class Config():
     def __init__(self) -> None:
-        self.algothrim = "SAC" #"TD3", "TQC"
-        self.env_name = "ant_sac"
-        self.trace_name = "trace/trace_ant_sac_1000000.pkl"
+        self.algothrim = "TQC" #"TD3", "TQC"
+        self.env_name = "walker2d_tqc"
+        self.trace_name = "trace/trace_walker2d_tqc_1000000.0.pkl"
         self.mode = "max" #"mean", "abs_mean"
         self.trace_num = 600
 
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     para = Config()
     with open(para.trace_name, "rb") as f:
         load_data = dill.load(f)
+    print(load_data["name"])
     if para.mode == "mean":
         savepath_gradient = "save_gradient/{}_{}_gradient_{}.pkl".format(para.env_name, para.mode, para.trace_num)
         calculate_mean_gradient(load_data=load_data, trace_num=para.trace_num, savepath=savepath_gradient)
@@ -141,5 +142,5 @@ if __name__ == "__main__":
     
     savepath_weight = "save_weight/{}_weight.pkl".format(para.env_name)
     record_weight(load_data=load_data, savepath=savepath_weight)
-    # print(load_data["name"])
+    print(load_data["name"])
     
