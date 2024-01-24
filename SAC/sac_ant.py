@@ -42,9 +42,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
         gradient = dill.load(f)
     with open(weight_path, "rb") as f:
-        weight = dill.load(f)
-    # gm = preprocessing(gradient)
-    # print(gradient)
+        weight = dill.load(f)   
     gn = [torch.abs(g * k1) for g in gradient]
     wn = [torch.abs(w * k2) for w in weight]
     amp_init = [gn[i] + wn[i] for i in range(len(gn))]

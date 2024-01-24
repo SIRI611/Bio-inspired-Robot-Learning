@@ -68,7 +68,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env,render_mode="human")
 
 
 
@@ -140,6 +140,7 @@ else:
                       "mu_weight_centre":deque(),
                       "mu_bias_amp":deque(),
                       "mu_bias_centre":deque()}
+                
             state = env.reset()[0]
             episode_reward = 0
             step = 0
