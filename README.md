@@ -62,4 +62,5 @@ Configure the parameters, in the td3_main.py, set **Config.is_train** as False a
 cd TD3/
 python td3_main.py
 ```
+TimeOfRecording=time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 
