@@ -89,7 +89,8 @@ env = gym.make(para.env,render_mode="human")
 # env = gym.make(para.env)
 
 state_dim = env.observation_space.shape[0]
-cirtic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
+critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
+critic_net.load_state_dict(torch.load("save_critic/{}_{}.pkl".format(para.env_name, para.total_step)))
 
 
 if para.is_train:
@@ -167,10 +168,12 @@ else:
                 
                 if reward_average == 0:
                     reward_average = reward
+                    reward_target = critic_net(state).detach()
+                    loss = critic_net.learn(state, reward)
+                    reward_diff = reward - reward_target
+                    reward_diff = reward_diff.detach().numpy()[0]
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
-                
-                # reward_diff = reward - reward_average
 
                 reward_target = cirtic_net(state).detach()
                 loss = cirtic_net.learn(state, reward)
