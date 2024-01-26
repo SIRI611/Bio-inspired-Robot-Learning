@@ -62,4 +62,3 @@ Configure the parameters, in the td3_main.py, set **Config.is_train** as False a
 cd TD3/
 python td3_main.py
 ```
-

@@ -228,8 +228,8 @@ class TD3(OffPolicyAlgorithm):
                     # print("load data!")
                     with open("actor_"+self.trace_path, 'wb') as f:
                         dill.dump(self.actor.Trace, f)
-                    with open("target_actor_"+self.trace_path, "wb") as f:
-                        dill.dump(self.actor_target.Trace, f)
+                    # with open("target_actor_"+self.trace_path, "wb") as f:
+                    #     dill.dump(self.actor_target.Trace, f)
                 
                 self.actor.optimizer.step()
 

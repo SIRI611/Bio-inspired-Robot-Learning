@@ -21,7 +21,7 @@ class Config():
         self.k1 = 0.001
         self.k2 = 0.00002
         self.total_step = 1e6
-        self.is_train = False
+        self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 3000
         self.average_a = 0.9        # 10
@@ -60,7 +60,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 # env = gym.make(para.env)
 
 
