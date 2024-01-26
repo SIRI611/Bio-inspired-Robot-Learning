@@ -3,6 +3,10 @@ import dill
 from tqc import TQC
 import torch
 import numpy as np
+import time
+
+# torch.set_printoptions(precision=16)
+# torch.set_default_dtype(torch.float64)
 
 np.set_printoptions(threshold=np.inf)
 # range_adapter = RangeAdapter()
@@ -27,22 +31,21 @@ class Config():
     def __init__(self) -> None:
         self.k1 = 0.01
         self.k2 = 0.002
-        self.total_step = 2e6
+        self.total_step = 1e6
         self.is_train = False
-        self.is_continue_train = False
+        self.is_continue_train = True
         self.continue_train_episodes = 3000
-        self.average_a = 0.9        # 10
-        self.average_b = 0.98       # 50
-        self.lr = 1e-3
-        # self.modelfilepath = "td3_humanoid.pkl"
-        self.env = "Humanoid-v4"
-        self.dt = 15
+        self.average_a = 0.995        # 200
+        self.average_b = 0.995       # 200
+        self.lr = 1e-4
+        self.env = "Walker2d-v4"
+        self.dt = 8
         self.num_test = 10
-        self.env_name="humanoid_tqc"
+        self.env_name="walker2d_tqc"
         #TODO change path
-        self.logpath = "tensorboard/tqc_humanoid_tensorboard"
-        self.gradient_path = "save_gradient/humanoid_tqc_max_gradient_600.pkl"
-        self.weight_path = "save_weight/humanoid_tqc_weight.pkl"
+        self.logpath = "tensorboard/tqc_walker2d_tensorboard"
+        self.gradient_path = "save_gradient/walker2d_tqc_max_gradient_600.pkl"
+        self.weight_path = "save_weight/walker2d_tqc_weight.pkl"
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "alpha": deque(),
@@ -69,6 +72,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 para = Config()
 episode_rewards = list()
 env = gym.make(para.env,render_mode="human")
+# env = gym.make(para.env)
 
 
 
@@ -108,17 +112,18 @@ else:
         print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
-        with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "wb") as f:
+        nowtime = time.strftime("%m-%d %H:%M:%S", time.localtime())
+        with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "wb") as f:
             dill.dump(para.Trace, f)
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=4000, dt=para.dt,
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=1250, dt=para.dt,
                                                        a=1e-5,
                                                        b=-1e-5,
                                                        alpha_0=-0.05,
                                                        alpha_1=0.05)
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
-                with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "rb") as f:
+                with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "rb") as f:
                     data = dill.load(f)
                 data["step_reward"] += para.Trace["step_reward"]
                 data["step_reward_average"] += para.Trace["step_reward_average"]
@@ -129,7 +134,7 @@ else:
                 data["mu_weight_centre"] += para.Trace["mu_weight_centre"]
                 data["mu_bias_amp"] += para.Trace["mu_bias_amp"]
                 data["mu_bias_centre"] += para.Trace["mu_bias_centre"]
-                with open("trace_continue_train/{}_trace_continue_train.pkl".format(para.env_name), "wb") as f:
+                with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "wb") as f:
                     dill.dump(data, f)
                 para.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
@@ -177,10 +182,14 @@ else:
                 # model.actor.learn_dynamic(reward_)
                 model.actor.learn_dynamic(reward_diff_average)
                 episode_reward += reward
-                para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"])
-                para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"])
-                para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"])
-                para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"])
+                
+                para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
+                # print("weight centre:%.16f" %(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'][3][200]))
+                para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
+                para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
+                para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
+                # print("weight centre:%.7f" %(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'][3][200]))
+                # print(reward)
                 # if step == 10000:
                 #     plt.plot(range(10000), trace_reward, "g-")
                 #     plt.savefig("range_adapter.png")
@@ -191,11 +200,12 @@ else:
                     break
             para.Trace["episode_reward"].append(episode_reward)
             print("oscillate weight center:")
-            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_centre'])
+            # print(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'])
+            print("weight centre:%.7f" %(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'][3][200]))
             # print("weight_oscillate_decay:")
             # print(model.actor.optimizer_dynamic.state_dict()['state'][5]['weight_oscilate_decay'])
-            print("oscillate amp:")
-            print(model.actor.optimizer_dynamic.state_dict()['state'][5]['amp'])
+            # print("oscillate amp:")
+            # print(model.actor.optimizer_dynamic.state_dict()['state'][5]['amp'])
             print("episode:", episode_idx, "\nepisode_reward:", episode_reward, "\n")  
             episode_rewards.append(episode_reward)
             para.Trace["episode_reward_average"].append(sum(episode_rewards)/len(episode_rewards))
