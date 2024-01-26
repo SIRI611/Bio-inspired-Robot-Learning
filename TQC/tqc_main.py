@@ -4,6 +4,7 @@ from tqc import TQC
 import torch
 import numpy as np
 import time
+from critic import Critic
 
 # torch.set_printoptions(precision=16)
 # torch.set_default_dtype(torch.float64)
@@ -14,19 +15,21 @@ np.set_printoptions(threshold=np.inf)
 from dynamicsynapse import DynamicSynapse
 from Adapter.RangeAdapter import RangeAdapter
 from collections import deque
-def closure(r):
-    def a():
-        # out = adapter.step_dynamics(dt, r)
-        # adapter.update()
-        return r
-    return a
+# def closure(r):
+#     def a():
+#         # out = adapter.step_dynamics(dt, r)
+#         # adapter.update()
+#         return r
+#     return a
 
-def preprocessing(data):
-    # torch.abs(data)
-    for li in data:
-        li = (li - torch.mean(li)) / torch.std(li)
-    return data
+# def preprocessing(data):
+#     # torch.abs(data)
+#     for li in data:
+#         li = (li - torch.mean(li)) / torch.std(li)
+    # return data
+
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.01
@@ -48,13 +51,15 @@ class Config():
         self.weight_path = "save_weight/walker2d_tqc_weight.pkl"
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
+                      "step_reward_target":deque(),
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
                       "mu_weight_amp": deque(),
                       "mu_weight_centre":deque(),
                       "mu_bias_amp": deque(),
-                      "mu_bias_centre":deque()}
+                      "mu_bias_centre":deque(),
+                      "critic_loss":deque()}
         
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
@@ -74,6 +79,8 @@ episode_rewards = list()
 env = gym.make(para.env,render_mode="human")
 # env = gym.make(para.env)
 
+state_dim = env.observation_space.shape[0]
+cirtic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
 
 
 if para.is_train:
@@ -121,12 +128,14 @@ else:
                                                        b=-1e-5,
                                                        alpha_0=-0.05,
                                                        alpha_1=0.05)
+        
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
                 with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "rb") as f:
                     data = dill.load(f)
                 data["step_reward"] += para.Trace["step_reward"]
                 data["step_reward_average"] += para.Trace["step_reward_average"]
+                data["step_reward_target"] += para.Trace["step_reward_target"]
                 data["alpha"] += para.Trace["alpha"]
                 data["episode_reward"] += para.Trace["episode_reward"]
                 data["episode_reward_average"] += para.Trace["episode_reward_average"]
@@ -134,17 +143,20 @@ else:
                 data["mu_weight_centre"] += para.Trace["mu_weight_centre"]
                 data["mu_bias_amp"] += para.Trace["mu_bias_amp"]
                 data["mu_bias_centre"] += para.Trace["mu_bias_centre"]
+                data["critic_loss"] += para.Trace["critic_loss"]
                 with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "wb") as f:
                     dill.dump(data, f)
                 para.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
+                      "step_reward_target":deque(),
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
                       "mu_weight_amp": deque(),
                       "mu_weight_centre":deque(),
                       "mu_bias_amp":deque(),
-                      "mu_bias_centre":deque()}
+                      "mu_bias_centre":deque(),
+                      "critic_loss":deque()}
                 
             state = env.reset()[0]
             episode_reward = 0
@@ -159,10 +171,21 @@ else:
 
                 if reward_average == 0:
                     reward_average = reward
+                    reward_target = cirtic_net(state).detach()
+                    loss = cirtic_net.learn(state, reward)
+                    reward_diff = reward - reward_target
+                    reward_diff = reward_diff.detach().numpy()[0]
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
-                    reward_diff = reward - reward_average
+
+                    reward_target = cirtic_net(state).detach()
+                    loss = cirtic_net.learn(state, reward)
+                    reward_diff = reward - reward_target
+                    reward_diff = reward_diff.detach().numpy()[0]
+                    # reward_diff = reward - reward_average
+
                 para.Trace["step_reward_average"].append(reward_average)
+                para.Trace["step_reward_target"].append(reward_target)
                 reward_diff_average = para.average_b * reward_diff_average + (1 - para.average_b) * reward_diff
                 # print(reward_average)
                 # print(reward_diff_average)
