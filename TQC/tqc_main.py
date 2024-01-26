@@ -32,12 +32,12 @@ device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
 
 class Config():
     def __init__(self) -> None:
-        self.k1 = 0.01
+        self.k1 = 0.005
         self.k2 = 0.002
         self.total_step = 1e6
         self.is_train = False
         self.is_continue_train = True
-        self.continue_train_episodes = 3000
+        self.continue_train_episodes = 1000
         '''
         0.6 - 2
         0.9 - 10
@@ -48,7 +48,7 @@ class Config():
         '''
         self.average_a = 0.995
         self.average_b = 0.995
-        self.lr = 1e-4
+        self.lr = 5e-5
         self.env = "Walker2d-v4"
         self.dt = 8
         self.num_test = 10
@@ -67,7 +67,8 @@ class Config():
                       "mu_weight_centre":deque(),
                       "mu_bias_amp": deque(),
                       "mu_bias_centre":deque(),
-                      "critic_loss":deque()}
+                      "critic_loss":deque(),
+                      "episode_step":deque()}
         
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
@@ -134,7 +135,7 @@ else:
                                                        a=1e-5,
                                                        b=-1e-5,
                                                        alpha_0=-0.05,
-                                                       alpha_1=0.05)
+                                                       alpha_1=0.07)
         
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
@@ -151,6 +152,7 @@ else:
                       "mu_weight_centre":deque(),
                       "mu_bias_amp":deque(),
                       "mu_bias_centre":deque(),
+                      "episode_step":deque(),
                       "critic_loss":deque()}
                 
             state = env.reset()[0]
@@ -165,19 +167,15 @@ else:
                 
                 if reward_average == 0:
                     reward_average = reward
-                    reward_target = cirtic_net(state).detach()
-                    loss = cirtic_net.learn(state, reward)
-                    reward_diff = reward - reward_target
-                    reward_diff = reward_diff.detach().numpy()[0]
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
+                
+                # reward_diff = reward - reward_average
 
-                    reward_target = cirtic_net(state).detach()
-                    loss = cirtic_net.learn(state, reward)
-                    reward_diff = reward - reward_target
-                    reward_diff = reward_diff.detach().numpy()[0]
-                    # reward_diff = reward - reward_average
-
+                reward_target = cirtic_net(state).detach()
+                loss = cirtic_net.learn(state, reward)
+                reward_diff = reward - reward_target
+                reward_diff = reward_diff.detach().numpy()[0]
                 
                 reward_diff_average = para.average_b * reward_diff_average + (1 - para.average_b) * reward_diff
                 alpha = reward_diff_average
@@ -202,13 +200,14 @@ else:
                 episode_reward += reward
 
                 para.Trace["step_reward"].append(reward)
-                para.Trace["step_reward_average"].append(reward_average)
+                # para.Trace["step_reward_average"].append(reward_average)
                 para.Trace["step_reward_target"].append(reward_target)
                 para.Trace["alpha"].append(alpha)
                 para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
                 para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
-                para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
-                para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
+                # para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
+                # para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
+                # para.Trace["critic_loss"].append(loss)
 
                 # print(reward)
                 # if step == 10000:
@@ -217,7 +216,7 @@ else:
                 #     plt.show()
 
                 #* step monitor
-                if step % 10 == 1:
+                if step % 100 == 1.5:
                     print("mu weight amp:%.7f, mu weight centre:%.7f, reward exp average:%.7f, alpha:%.7f" 
                           %(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"][3][200],
                             model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"][3][200],
@@ -230,6 +229,7 @@ else:
             episode_rewards.append(episode_reward)
             para.Trace["episode_reward"].append(episode_reward)
             para.Trace["episode_reward_average"].append(sum(episode_rewards)/len(episode_rewards))
+            para.Trace["episode_step"].append(step)
 
             #* episode monitor
             print("\nepisode:", episode_idx, "\nepisode_reward:", episode_reward)  

@@ -229,13 +229,17 @@ class DynamicSynapse(Optimizer):
                 #         "weight_centre_var=" + str(weight_centre_var) + \
                 #          "\nweighter_centre" + str(weight_centre)
                 weight_centre += weight_centre_var
+
+                beta = -weight_oscilate_decay * modulator_amount_osci * group['lr']
+
                 if self.mode == 0:
-                    amp *= np.exp(self.b * group['dt'])
+                    amp *= torch.exp((self.b + beta) * group['dt'])
                 if self.mode == 1:
-                    amp *= np.exp(self.a * group['dt'])
+                    amp *= torch.exp((self.a + beta) * group['dt'])
                 if self.mode == 2:
                     amp *= 1
-
+                if self.t % 8000 == 1:
+                    self.a *= 0.9698 
                 # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
                 zero_cross = torch.logical_and(torch.less(p, weight_centre),
                                                torch.greater_equal(weight, weight_centre))
