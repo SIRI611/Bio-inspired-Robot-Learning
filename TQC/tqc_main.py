@@ -175,8 +175,8 @@ else:
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
 
-                reward_target = cirtic_net(state).detach()
-                loss = cirtic_net.learn(state, reward)
+                reward_target = critic_net(state).detach()
+                loss = critic_net.learn(state, reward)
                 reward_diff = reward - reward_target
                 reward_diff = reward_diff.detach().numpy()[0]
                 
