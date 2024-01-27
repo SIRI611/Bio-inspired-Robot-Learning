@@ -7,7 +7,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_tqc_trace_continue_train_01-26 22:23:24'
+        self.trace_name = 'walker2d_tqc_trace_continue_train_01-27_16-45-43'
         self.alpha_0 = -0.05
         self.alpha_1 = 0.05
         self.Trace = {"step_reward": deque(),
@@ -26,7 +26,6 @@ para = Config()
 
 aTR = TraceReader(log_file_path='trace_continue_train/' + para.trace_name + '.pkl')
 data = aTR.get_trace()
-
 
 i = 3   # ℹ th dimension of action space, e.g i th neuro in last layer
 ii_weight = 200    # weight of neuro ii_weight to neuro i, from previous layer to last layer(the action-generate layer)
@@ -55,8 +54,6 @@ for j in range(len(data["episode_reward"])):
     list2 = [data["episode_reward_average"][j] for x in range(data["episode_step"][j])]
     episode_reward.extend(list1)
     episode_reward_average.extend(list2)
-
-print(np.shape(episode_reward_average))
 
 ax[2].plot(episode_reward, linewidth=0.6, label="episode reward")
 ax[2].plot(episode_reward_average, linewidth=0.6, label="episode reward average")

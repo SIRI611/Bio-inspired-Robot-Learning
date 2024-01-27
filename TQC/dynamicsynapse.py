@@ -238,8 +238,11 @@ class DynamicSynapse(Optimizer):
                     amp *= torch.exp((self.a + beta) * group['dt'])
                 if self.mode == 2:
                     amp *= 1
-                if self.t % 8000 == 1:
-                    self.a *= 0.9698 
+                if self.t % 8000 == self.dt * 0 and i == (len(group['params']) - 1):
+                    self.a *= 0.9698
+                    print('\n' + "=="*50)
+                    print("a:%.11f, b:%.11f, beta:%.11f, a + beta:%.11f, b + beta:%.11f" 
+                          %(self.a, self.b, beta.cpu().detach().numpy()[-1], self.a+beta.cpu().detach().numpy()[-1], self.b+beta.cpu().detach().numpy()[-1]))
                 # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
                 zero_cross = torch.logical_and(torch.less(p, weight_centre),
                                                torch.greater_equal(weight, weight_centre))

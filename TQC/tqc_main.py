@@ -48,7 +48,7 @@ class Config():
         '''
         self.average_a = 0.995
         self.average_b = 0.995
-        self.lr = 5e-5
+        self.lr = 1e-4
         self.env = "Walker2d-v4"
         self.dt = 8
         self.num_test = 10
@@ -130,13 +130,14 @@ else:
         print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
-        nowtime = time.strftime("%m-%d %H:%M:%S", time.localtime())
+        nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
         model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=1250, dt=para.dt,
                                                        a=1e-5,
                                                        b=-1e-5,
                                                        alpha_0=-0.05,
-                                                       alpha_1=0.07)
+                                                       alpha_1=0.07,
+                                                       weight_oscillate_decay=1e-1)
         
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
@@ -168,15 +169,11 @@ else:
                 
                 if reward_average == 0:
                     reward_average = reward
-                    reward_target = critic_net(state).detach()
-                    loss = critic_net.learn(state, reward)
-                    reward_diff = reward - reward_target
-                    reward_diff = reward_diff.detach().numpy()[0]
                 else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
 
                 reward_target = critic_net(state).detach()
-                loss = critic_net.learn(state, reward)
+                # loss = critic_net.learn(state, reward)
                 reward_diff = reward - reward_target
                 reward_diff = reward_diff.detach().numpy()[0]
                 
@@ -204,7 +201,7 @@ else:
 
                 para.Trace["step_reward"].append(reward)
                 # para.Trace["step_reward_average"].append(reward_average)
-                para.Trace["step_reward_target"].append(reward_target)
+                para.Trace["step_reward_target"].append(reward_target.detach().numpy())
                 para.Trace["alpha"].append(alpha)
                 para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
                 para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
@@ -235,7 +232,7 @@ else:
             para.Trace["episode_step"].append(step)
 
             #* episode monitor
-            print("\nepisode:", episode_idx, "\nepisode_reward:", episode_reward)  
+            print("episode:", episode_idx, "\nepisode_reward:", episode_reward)  
             print("oscillate weight center:")
             print(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'])
             # print("weight centre:%.7f" %(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'][3][200]))
