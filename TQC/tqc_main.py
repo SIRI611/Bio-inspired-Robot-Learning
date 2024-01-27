@@ -53,7 +53,7 @@ class Config():
         self.dt = 8
         self.total_step = 1e6
         self.is_train = False
-        self.is_continue_train = False
+        self.is_continue_train = True
         self.continue_train_episodes = 1000
 
         self.env = "Walker2d-v4"
@@ -91,12 +91,10 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-# env = gym.make(para.env,render_mode="human")
-env = gym.make(para.env)
+env = gym.make(para.env,render_mode="human")
+# env = gym.make(para.env)
 
-state_dim = env.observation_space.shape[0]
-critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
-critic_net.load_state_dict(torch.load("save_critic/{}_{}.pkl".format(para.env_name, para.total_step)))
+
 
 
 if para.is_train:
@@ -119,7 +117,7 @@ else:
     reward_diff_average = 0     #alpha
     alpha = 0
     if not para.is_continue_train:
-        model = TQC.load("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
+        # model = TQC.load("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
         for _ in range(para.num_test):    
             state = env.reset()[0]
             episode_reward = 0
@@ -137,6 +135,9 @@ else:
         print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
+        state_dim = env.observation_space.shape[0]
+        critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
+        critic_net.load_state_dict(torch.load("save_critic/{}_{}.pkl".format(para.env_name, para.total_step)))
         nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
         model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=para.period, dt=para.dt,

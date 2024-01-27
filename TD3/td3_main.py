@@ -21,21 +21,21 @@ class Config():
         self.k1 = 0.001
         self.k2 = 0.00002
         self.total_step = 1e6
-        self.is_train = True
+        self.is_train = False
         self.is_continue_train = False
         self.continue_train_episodes = 3000
         self.average_a = 0.9        # 10
         self.average_b = 0.98       # 50
         self.lr = 1e-3
         # self.modelfilepath = "td3_humanoid.pkl"
-        self.env = "Ant-v4"
+        self.env = "Walker2d-v4"
         self.dt = 15
         self.num_test = 10
-        self.env_name="ant_td3"
+        self.env_name="walker2d_td3"
         #TODO change path
         self.logpath = "tensorboard/td3_ant_tensorboard"
-        self.gradient_path = "save_gradient/Ant_td3_max_gradient_300.pkl"
-        self.weight_path = "save_weight/Ant_td3_weight.pkl"
+        self.gradient_path = "save_gradient/walker2d_td3_max_gradient_300.pkl"
+        self.weight_path = "save_weight/walker2d_td3_weight.pkl"
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "alpha": deque(),
@@ -60,8 +60,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env)
 # env = gym.make(para.env)
+env = gym.make(para.env,render_mode="human")
 
 
 if para.is_train:
