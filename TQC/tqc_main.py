@@ -34,10 +34,6 @@ class Config():
     def __init__(self) -> None:
         self.k1 = 0.005
         self.k2 = 0.002
-        self.total_step = 1e6
-        self.is_train = False
-        self.is_continue_train = True
-        self.continue_train_episodes = 1000
         '''
         0.6 - 2
         0.9 - 10
@@ -48,9 +44,19 @@ class Config():
         '''
         self.average_a = 0.995
         self.average_b = 0.995
+        self.alpha_0 = -0.0015
+        self.alpha_1 = 0.002
+        self.a = 1e-5
+        self.b = 1e-5
+        self.period = 1250
         self.lr = 1e-4
-        self.env = "Walker2d-v4"
         self.dt = 8
+        self.total_step = 1e6
+        self.is_train = False
+        self.is_continue_train = False
+        self.continue_train_episodes = 1000
+
+        self.env = "Walker2d-v4"
         self.num_test = 10
         self.env_name="walker2d_tqc"
         #TODO change path
@@ -85,8 +91,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env,render_mode="human")
-# env = gym.make(para.env)
+# env = gym.make(para.env,render_mode="human")
+env = gym.make(para.env)
 
 state_dim = env.observation_space.shape[0]
 critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
@@ -113,6 +119,7 @@ else:
     reward_diff_average = 0     #alpha
     alpha = 0
     if not para.is_continue_train:
+        model = TQC.load("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
         for _ in range(para.num_test):    
             state = env.reset()[0]
             episode_reward = 0
@@ -132,12 +139,12 @@ else:
     if para.is_continue_train:
         nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
-        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=1250, dt=para.dt,
-                                                       a=1e-5,
-                                                       b=-1e-5,
-                                                       alpha_0=-0.05,
-                                                       alpha_1=0.07,
-                                                       weight_oscillate_decay=1e-1)
+        model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=para.period, dt=para.dt,
+                                                       a=para.a,
+                                                       b=para.b,
+                                                       alpha_0=para.alpha_0,
+                                                       alpha_1=para.alpha_1,
+                                                       weight_oscillate_decay=1e-2)
         
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
@@ -173,7 +180,7 @@ else:
                     reward_average = para.average_a * reward_average + (1 - para.average_a) * reward
 
                 reward_target = critic_net(state).detach()
-                # loss = critic_net.learn(state, reward)
+                loss = critic_net.learn(state, reward)
                 reward_diff = reward - reward_target
                 reward_diff = reward_diff.detach().numpy()[0]
                 
