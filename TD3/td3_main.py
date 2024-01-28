@@ -31,18 +31,7 @@ from collections import deque
 
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
 # device = torch.device("cpu")
-def ChooseContinueTracePath():
-    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
-        path='/home/robot/Documents/ContinueTrace/'
-    if platform.node() == 'DESKTOP-6S7M1IE':
-        path='C:/ContinueTrace/'
-    if platform.node() == 'ubuntu':
-        path='/home/user/Desktop/robot/ContinueTrace/'
-    else:
-        path=''
-    if not os.path.exists(path):
-        os.makedirs(path)        
-    return path
+
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.005
@@ -91,6 +80,18 @@ class Config():
                       "critic_loss":deque(),
                       "episode_step":deque()}
         
+def ChooseContinueTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/ContinueTrace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/ContinueTrace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/ContinueTrace/'
+    else:
+        path='ContinueTrace/'
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
@@ -110,9 +111,6 @@ para = Config()
 episode_rewards = list()
 env = gym.make(para.env, render_mode='human')
 # env = gym.make(para.env)
-
-
-
 
 if para.is_train:
     model = TD3("MlpPolicy", env, 
@@ -233,7 +231,7 @@ else:
                 para.Trace["reward_diff"].append(reward_diff)
                 para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
                 para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
-                para.Trace["mu_weight"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight"].cpu().detach().numpy())
+                # para.Trace["mu_weight"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight"].cpu().detach().numpy())
                 # para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
                 # para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
                 # para.Trace["critic_loss"].append(loss)

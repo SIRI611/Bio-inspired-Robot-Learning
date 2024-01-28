@@ -27,10 +27,11 @@ def ChooseTracePath():
     if platform.node() == 'ubuntu':
         path='/home/user/Desktop/robot/Trace/'
     else:
-        path=''
+        path='Trace/'
     if not os.path.exists(path):
         os.makedirs(path)        
     return path
+
 class TQC(OffPolicyAlgorithm):
     """
 
