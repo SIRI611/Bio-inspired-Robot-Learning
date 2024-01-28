@@ -1,7 +1,8 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 import torch.optim as optim
+
 
 class Critic(nn.Module):
     def __init__(self, state_dim, device, hidden_dim=[256, 256], gamma=0.99, lr=1e-4):

@@ -1,11 +1,12 @@
-import gymnasium as gym
-import dill
-from tqc import TQC
-import torch
-import numpy as np
 import time
-from critic import Critic
 
+import dill
+import gymnasium as gym
+import numpy as np
+import torch
+
+from critic import Critic
+from tqc import TQC
 
 
 class Config():

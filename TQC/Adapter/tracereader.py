@@ -1,8 +1,11 @@
-from collections import deque
-import warnings
 import os
-from filereader import fileload
+import warnings
+from collections import deque
+
 import numpy as np
+
+from filereader import fileload
+
 
 class TraceReader:
     def __init__(self, log_file_path=''):

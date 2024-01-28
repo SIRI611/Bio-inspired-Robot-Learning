@@ -1,7 +1,9 @@
+from collections import deque
+
 import dill
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import deque
+
 from tracereader import TraceReader
 
 

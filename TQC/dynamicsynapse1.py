@@ -1,10 +1,11 @@
-import sys
 import copy
 import math
-import torch
-from torch.optim.optimizer import Optimizer
+import sys
+
 # from DynamicSynapse.Adapter.RangeAdapter import RangeAdapter
 import numpy as np
+import torch
+from torch.optim.optimizer import Optimizer
 
 
 class DynamicSynapse(Optimizer):

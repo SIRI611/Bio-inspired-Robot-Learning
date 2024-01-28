@@ -1,6 +1,6 @@
+from collections import deque
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from dynamicsynapse import DynamicSynapse
-from Adapter.RangeAdapter import RangeAdapter
+
 import torch as th
 from gymnasium import spaces
 from stable_baselines3.common.distributions import SquashedDiagGaussianDistribution, StateDependentNoiseDistribution
@@ -16,7 +16,9 @@ from stable_baselines3.common.torch_layers import (
 )
 from stable_baselines3.common.type_aliases import PyTorchObs, Schedule
 from torch import nn as nn
-from collections import deque
+
+from Adapter.RangeAdapter import RangeAdapter
+from dynamicsynapse import DynamicSynapse
 
 adapter = RangeAdapter()
 def closure(r, dt):

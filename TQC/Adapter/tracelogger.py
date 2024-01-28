@@ -1,11 +1,12 @@
-from collections import deque
-import warnings
-import dill
+import copy
+import os
 import sys
 import tempfile
 import time
-import os
-import copy
+import warnings
+from collections import deque
+
+import dill
 
 
 class TraceLogger:

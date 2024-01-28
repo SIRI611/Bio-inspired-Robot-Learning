@@ -1,12 +1,13 @@
 import copy
-
-import numpy as np
-from collections import deque
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 import os
-import time
 import tempfile
+import time
+from collections import deque
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 # from tracelogger import TraceLogger
 # from tracereader import TraceReader

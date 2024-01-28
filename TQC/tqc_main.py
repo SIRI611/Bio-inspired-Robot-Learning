@@ -1,10 +1,12 @@
-import gymnasium as gym
-import dill
-from tqc import TQC
-import torch
-import numpy as np
 import time
+
+import dill
+import gymnasium as gym
+import numpy as np
+import torch
+
 from critic import Critic
+from tqc import TQC
 
 # torch.set_printoptions(precision=16)
 # torch.set_default_dtype(torch.float64)
@@ -91,8 +93,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-# env = gym.make(para.env,render_mode="human")
-env = gym.make(para.env)
+env = gym.make(para.env,render_mode="human")
+# env = gym.make(para.env)
 
 state_dim = env.observation_space.shape[0]
 critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
@@ -119,7 +121,7 @@ else:
     reward_diff_average = 0     #alpha
     alpha = 0
     if not para.is_continue_train:
-        model = TQC.load("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
+        # model = TQC.load("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
         for _ in range(para.num_test):    
             state = env.reset()[0]
             episode_reward = 0
@@ -127,7 +129,7 @@ else:
             for _ in range(1000):
                 action, _state = model.predict(state, deterministic=True)
 
-                # env.render()         
+                env.render()
                 state, reward, done, _, _ = env.step(action)
                 episode_reward += reward
                 if done:
