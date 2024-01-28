@@ -240,9 +240,9 @@ class DynamicSynapse(Optimizer):
                     amp *= torch.exp((self.a + beta) * group['dt'])
                 if self.mode == 2:
                     amp *= torch.exp(beta * group["dt"])
-                if self.t % 8000 == self.dt * 0 and i == (len(group['params']) - 1):
+                if self.t % (1000 * dt) == self.dt * 0 and i == (len(group['params']) - 1):
                     self.a *= 0.9698
-                    print('\n' + "=="*50)
+                    print('\n' + "=="*25 + " 1000 step " + "=="*25)
                     print("a:%.11f, b:%.11f, beta:%.11f, a + beta:%.11f, b + beta:%.11f" 
                           %(self.a, self.b, beta.cpu().detach().numpy()[-1], self.a+beta.cpu().detach().numpy()[-1], self.b+beta.cpu().detach().numpy()[-1]))
                 # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])

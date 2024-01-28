@@ -24,6 +24,8 @@ def ChooseTracePath():
         path='/home/robot/Documents/Trace/'
     if platform.node() == 'DESKTOP-6S7M1IE':
         path='C:/Trace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/Trace/'
     else:
         path=''
     if not os.path.exists(path):

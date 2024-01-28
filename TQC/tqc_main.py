@@ -29,13 +29,15 @@ from collections import deque
 #         li = (li - torch.mean(li)) / torch.std(li)
     # return data
 
-# device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
-device = torch.device("cpu")
+device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+# device = torch.device("cpu")
 def ChooseContinueTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/ContinueTrace/'
     if platform.node() == 'DESKTOP-6S7M1IE':
         path='C:/ContinueTrace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/ContinueTrace/'
     else:
         path=''
     if not os.path.exists(path):
@@ -105,8 +107,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode='human')
-# env = gym.make(para.env)
+# env = gym.make(para.env, render_mode='human')
+env = gym.make(para.env)
 
 
 

@@ -1,10 +1,11 @@
-import sys
 import copy
 import math
-import torch
-from torch.optim.optimizer import Optimizer
+import sys
+
 # from DynamicSynapse.Adapter.RangeAdapter import RangeAdapter
 import numpy as np
+import torch
+from torch.optim.optimizer import Optimizer
 
 
 class DynamicSynapse(Optimizer):
@@ -92,28 +93,29 @@ class DynamicSynapse(Optimizer):
         if dt is None:
             dt = self.dt
         self.t += dt
-        loss = None
+        reward = None
         if closure is not None:
-            loss = closure()
-        if torch.is_tensor(loss):
-            loss = loss.numpy()
+            reward, alpha  = closure()
 
-        if loss<self.alpha_0:
+        if torch.is_tensor(reward):
+            reward = reward.numpy()
+
+        if alpha<self.alpha_0:
             self.mode = 0
-        if loss<=self.alpha_1 and loss>=self.alpha_0:
+        if alpha<=self.alpha_1 and alpha>=self.alpha_0:
             self.mode = 1
-        if loss > self.alpha_1:
+        if alpha > self.alpha_1:
             self.mode = 2
         
         if self.using_range_adapter:
-            modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], loss, factor_rate=0.1)
+            modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], reward, factor_rate=0.1)
             if self.plot_reward:
                 self.range_adapter.recording()
             self.range_adapter.update()
             if self.range_adapter.t <self.range_adapter_warmup_time:
-                return loss
+                return reward
         else:
-            modulator_amount_osci = loss
+            modulator_amount_osci = reward
         # if modulator_amount_osci>10:
         #     modulator_amount_osci = 10
         # elif modulator_amount_osci<-10:
@@ -122,11 +124,11 @@ class DynamicSynapse(Optimizer):
         self.modulator_amount_osci = modulator_amount_osci
         if self.t % 100 == 99:
             if self.using_range_adapter:
-                print('time', str(self.t), 'loss: ', str(loss), 'modulator_amount_osci: ', str(modulator_amount_osci),
+                print('time', str(self.t), 'loss: ', str(reward), 'modulator_amount_osci: ', str(modulator_amount_osci),
                       'factor', str(self.range_adapter.current_factor),
                       'bias', str(self.range_adapter.current_bias), 'amp', str(self.amp))
             else:
-                print('time', str(self.t), 'loss: ', str(loss), 'modulator_amount_osci: ', str(modulator_amount_osci),
+                print('time', str(self.t), 'loss: ', str(reward), 'modulator_amount_osci: ', str(modulator_amount_osci),
                       'amp', str(self.amp))
         for group in self.param_groups:
 
@@ -229,13 +231,20 @@ class DynamicSynapse(Optimizer):
                 #         "weight_centre_var=" + str(weight_centre_var) + \
                 #          "\nweighter_centre" + str(weight_centre)
                 weight_centre += weight_centre_var
-                if self.mode == 0:
-                    amp *= np.exp(self.b * group['dt'])
-                if self.mode == 1:
-                    amp *= np.exp(self.a * group['dt'])
-                if self.mode == 2:
-                    amp *= 1
 
+                beta = -weight_oscilate_decay * modulator_amount_osci * group['lr']
+
+                if self.mode == 0:
+                    amp *= torch.exp((self.b + beta) * group['dt'])
+                if self.mode == 1:
+                    amp *= torch.exp((self.a + beta) * group['dt'])
+                if self.mode == 2:
+                    amp *= torch.exp(beta * group["dt"])
+                if self.t % (1000 * dt) == self.dt * 0 and i == (len(group['params']) - 1):
+                    self.a *= 0.9698
+                    print('\n' + "=="*25 + " 1000 step " + "=="*25)
+                    print("a:%.11f, b:%.11f, beta:%.11f, a + beta:%.11f, b + beta:%.11f" 
+                          %(self.a, self.b, beta.cpu().detach().numpy()[-1], self.a+beta.cpu().detach().numpy()[-1], self.b+beta.cpu().detach().numpy()[-1]))
                 # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
                 zero_cross = torch.logical_and(torch.less(p, weight_centre),
                                                torch.greater_equal(weight, weight_centre))
@@ -245,7 +254,7 @@ class DynamicSynapse(Optimizer):
                                                              std=period_centre[zero_cross] * period_var[zero_cross])
                 p.data = weight.data
             self.amp = state['amp']
-        return loss
+        return reward
 
 
 # class RangeAdapter:
