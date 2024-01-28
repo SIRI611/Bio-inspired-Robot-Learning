@@ -1,0 +1,6 @@
+numpy~=1.26.3
+torch~=2.1.2
+dill~=0.3.7
+mujoco<3
+gymnasium~=0.29.1
+matplotlib~=3.8.2
