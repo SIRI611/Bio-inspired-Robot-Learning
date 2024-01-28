@@ -3,10 +3,10 @@ import dill
 import gymnasium as gym
 import numpy as np
 import torch
-
+import platform
 from critic import Critic
 from tqc import TQC
-
+import os
 # torch.set_printoptions(precision=16)
 # torch.set_default_dtype(torch.float64)
 
@@ -30,7 +30,14 @@ from collections import deque
     # return data
 
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
-
+def ChooseContinueTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/ContinueTrace/'
+    else:
+        path=''
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.005
@@ -48,7 +55,7 @@ class Config():
         self.alpha_0 = -0.0015
         self.alpha_1 = 0.002
         self.a = 1e-5
-        self.b = 1e-5
+        self.b = -1e-5
         self.period = 1250
         self.lr = 1e-4
         self.dt = 8
@@ -150,7 +157,7 @@ else:
         
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
-                with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "ab") as f:
+                with open(ChooseContinueTracePath() + "{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "ab") as f:
                     dill.dump(para.Trace, f, protocol=dill.HIGHEST_PROTOCOL)
                 # reset Trace
                 para.Trace = {"step_reward": deque(),

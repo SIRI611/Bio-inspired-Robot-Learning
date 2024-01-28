@@ -3,13 +3,21 @@ from collections import deque
 import dill
 import matplotlib.pyplot as plt
 import numpy as np
-
+import platform
+import os
 from tracereader import TraceReader
 
-
+def ChooseContinueTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/ContinueTrace/'
+    else:
+        path=''
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_tqc_trace_continue_train_01-27_17-25-08'
+        self.trace_name = 'walker2d_tqc_trace_continue_train_01-27_20-13-02'
         self.alpha_0 = -0.0015
         self.alpha_1 = 0.002
         self.Trace = {"step_reward": deque(),
@@ -27,13 +35,13 @@ class Config():
 
 #* initialize
 para = Config()
-aTR = TraceReader(log_file_path='trace_continue_train/' + para.trace_name + '.pkl')
+aTR = TraceReader(log_file_path=ChooseContinueTracePath() + para.trace_name + '.pkl')
 data = aTR.get_trace()
 
 #! Change start_episode & end episode to define which episode to be ploted
-start_episode = 10
-end_episode = 200
-plot_episode = [max(start_episode, 0), min(len(data["episode_step"]), end_episode)]
+start_episode = 500
+end_episode = 1000
+plot_episode = [max(min(start_episode, len(data["episode_step"]), 0)), min(len(data["episode_step"]), end_episode)]
 start_step = 0
 end_step = 0
 

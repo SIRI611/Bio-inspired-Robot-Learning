@@ -11,14 +11,22 @@ from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.policies import BasePolicy
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback
 from stable_baselines3.common.utils import get_parameters_by_name, polyak_update
-
+import platform
+import os
 from Adapter.RangeAdapter import RangeAdapter
 from dynamicsynapse import DynamicSynapse
 from policies import Actor, CnnPolicy, Critic, MlpPolicy, MultiInputPolicy, TQCPolicy
 
 SelfTQC = TypeVar("SelfTQC", bound="TQC")
 
-
+def ChooseTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/Trace/'
+    else:
+        path=''
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 class TQC(OffPolicyAlgorithm):
     """
 
@@ -154,7 +162,7 @@ class TQC(OffPolicyAlgorithm):
         self.step = 0
         self.total_step = total_step
         self.trace_num = trace_num
-        self.trace_path = "trace/trace_"+env_name+"_"+str(total_step)+".pkl"
+        self.trace_path = ChooseTracePath() + "trace_"+env_name+"_"+str(total_step)+".pkl"
 
         if _init_setup_model:
             self._setup_model()
