@@ -22,6 +22,8 @@ SelfTQC = TypeVar("SelfTQC", bound="TQC")
 def ChooseTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/Trace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/Trace/'
     else:
         path=''
     if not os.path.exists(path):

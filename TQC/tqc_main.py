@@ -34,6 +34,8 @@ device = torch.device("cpu")
 def ChooseContinueTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/ContinueTrace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/ContinueTrace/'
     else:
         path=''
     if not os.path.exists(path):
@@ -75,6 +77,7 @@ class Config():
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "step_reward_target":deque(),
+                      "reward_diff":deque(),
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
@@ -166,6 +169,7 @@ else:
                 para.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "step_reward_target":deque(),
+                      "reward_diff":deque(),
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
@@ -222,6 +226,7 @@ else:
                 # para.Trace["step_reward_average"].append(reward_average)
                 para.Trace["step_reward_target"].append(reward_target.detach().numpy())
                 para.Trace["alpha"].append(alpha)
+                para.Trace["reward_diff"].append(reward_diff)
                 para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
                 para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
                 # para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())

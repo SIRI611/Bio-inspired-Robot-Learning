@@ -10,6 +10,8 @@ from tracereader import TraceReader
 def ChooseContinueTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/ContinueTrace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/ContinueTrace/'
     else:
         path=''
     if not os.path.exists(path):
@@ -17,12 +19,13 @@ def ChooseContinueTracePath():
     return path
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_tqc_trace_continue_train_01-27_20-13-02'
-        self.alpha_0 = -0.0015
-        self.alpha_1 = 0.002
+        self.trace_name = 'walker2d_tqc_trace_continue_train_01-28_19-10-25'
+        self.alpha_0 = -0.1
+        self.alpha_1 = 0.01
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "step_reward_target":deque(),
+                      "reward_diff":deque(),
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
@@ -39,9 +42,9 @@ aTR = TraceReader(log_file_path=ChooseContinueTracePath() + para.trace_name + '.
 data = aTR.get_trace()
 
 #! Change start_episode & end episode to define which episode to be ploted
-start_episode = 500
+start_episode = 0
 end_episode = 1000
-plot_episode = [max(min(start_episode, len(data["episode_step"]), 0)), min(len(data["episode_step"]), end_episode)]
+plot_episode = [max(min(start_episode, len(data["episode_step"])-1), 0), min(len(data["episode_step"])-1, end_episode)]
 start_step = 0
 end_step = 0
 
@@ -50,6 +53,14 @@ if not plot_episode[0] == 0:
     for j in range(plot_episode[0]):
         start_step += data["episode_step"][j]
     end_step = start_step
+if plot_episode[0] == plot_episode[-1]:
+    if plot_episode[0] == len(data["episode_step"]) - 1 and plot_episode[0] == 0:
+        plot_episode[-1] += 1
+    elif plot_episode[0] == len(data["episode_step"]) - 1 and not plot_episode[0] == 0:
+        plot_episode[0] -= 1
+    else:
+        plot_episode[-1] += 1
+
 for j in range(plot_episode[0], plot_episode[-1]):
     end_step += data["episode_step"][j]
 
@@ -74,18 +85,21 @@ ii_weight = 200    # weight of neuro ii_weight to neuro i, from previous layer t
 
 fig, ax = plt.subplots(4, 1,figsize=(15,12), sharex=True)
 fig.get_tight_layout()
-fig.suptitle("from episode {} to episode {}".format(start_episode, plot_episode[-1]))
+fig.suptitle("from episode {} to episode {}".format(plot_episode[0], plot_episode[-1]))
 # xticks = np.arange(start_step, end_step, 1000)
 
 # ax[0].grid(True)
 ax[0].plot(range(start_step, end_step), data["step_reward"], linewidth=0.6, label="step reward")
 # ax[0].plot(range(start_step, end_step), data["step_reward_average"], linewidth=1.5, label="step reward exp average")
-ax[0].plot(range(start_step, end_step), data["step_reward_target"], linewidth=1.0, label="step reward exp average(net learn)")
+ax[0].plot(range(start_step, end_step), data["step_reward_target"], linewidth=0.6, label="step reward exp average(net learn)")
+ax[0].plot(range(start_step, end_step), data["reward_diff"], linewidth=0.15, label="reward diff")
+ax[0].axhline(0, linewidth=0.6, color='black')
 # ax[0].plot(range(start_step, end_step), data["critic_loss"], linewidth=0.6, color='black', label="critic loss")
 ax[0].legend()
 
 # ax[1].grid(True)
 ax[1].plot(range(start_step, end_step), data["alpha"], linewidth=1, label="alpha" )
+# ax[1].plot(range(start_step, end_step), data["reward_diff"], linewidth=0.15, label="reward diff")
 ax[1].axhline(para.alpha_0, linewidth=0.6, color='black')
 ax[1].axhline(para.alpha_1, linewidth=0.6, color='black')
 ax[1].legend()
