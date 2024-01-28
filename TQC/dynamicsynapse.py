@@ -93,28 +93,29 @@ class DynamicSynapse(Optimizer):
         if dt is None:
             dt = self.dt
         self.t += dt
-        loss = None
+        reward = None
         if closure is not None:
-            loss = closure()
-        if torch.is_tensor(loss):
-            loss = loss.numpy()
+            reward, alpha  = closure()
 
-        if loss<self.alpha_0:
+        if torch.is_tensor(reward):
+            reward = reward.numpy()
+
+        if alpha<self.alpha_0:
             self.mode = 0
-        if loss<=self.alpha_1 and loss>=self.alpha_0:
+        if alpha<=self.alpha_1 and alpha>=self.alpha_0:
             self.mode = 1
-        if loss > self.alpha_1:
+        if alpha > self.alpha_1:
             self.mode = 2
         
         if self.using_range_adapter:
-            modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], loss, factor_rate=0.1)
+            modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], reward, factor_rate=0.1)
             if self.plot_reward:
                 self.range_adapter.recording()
             self.range_adapter.update()
             if self.range_adapter.t <self.range_adapter_warmup_time:
-                return loss
+                return reward
         else:
-            modulator_amount_osci = loss
+            modulator_amount_osci = reward
         # if modulator_amount_osci>10:
         #     modulator_amount_osci = 10
         # elif modulator_amount_osci<-10:
@@ -123,11 +124,11 @@ class DynamicSynapse(Optimizer):
         self.modulator_amount_osci = modulator_amount_osci
         if self.t % 100 == 99:
             if self.using_range_adapter:
-                print('time', str(self.t), 'loss: ', str(loss), 'modulator_amount_osci: ', str(modulator_amount_osci),
+                print('time', str(self.t), 'loss: ', str(reward), 'modulator_amount_osci: ', str(modulator_amount_osci),
                       'factor', str(self.range_adapter.current_factor),
                       'bias', str(self.range_adapter.current_bias), 'amp', str(self.amp))
             else:
-                print('time', str(self.t), 'loss: ', str(loss), 'modulator_amount_osci: ', str(modulator_amount_osci),
+                print('time', str(self.t), 'loss: ', str(reward), 'modulator_amount_osci: ', str(modulator_amount_osci),
                       'amp', str(self.amp))
         for group in self.param_groups:
 
@@ -238,7 +239,7 @@ class DynamicSynapse(Optimizer):
                 if self.mode == 1:
                     amp *= torch.exp((self.a + beta) * group['dt'])
                 if self.mode == 2:
-                    amp *= 1
+                    amp *= torch.exp(beta * group["dt"])
                 if self.t % 8000 == self.dt * 0 and i == (len(group['params']) - 1):
                     self.a *= 0.9698
                     print('\n' + "=="*50)
@@ -253,7 +254,7 @@ class DynamicSynapse(Optimizer):
                                                              std=period_centre[zero_cross] * period_var[zero_cross])
                 p.data = weight.data
             self.amp = state['amp']
-        return loss
+        return reward
 
 
 # class RangeAdapter:

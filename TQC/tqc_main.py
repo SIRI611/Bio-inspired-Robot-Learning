@@ -29,7 +29,8 @@ from collections import deque
 #         li = (li - torch.mean(li)) / torch.std(li)
     # return data
 
-device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+# device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cpu")
 def ChooseContinueTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/ContinueTrace/'
@@ -52,12 +53,12 @@ class Config():
         '''
         self.average_a = 0.995
         self.average_b = 0.995
-        self.alpha_0 = -0.0015
-        self.alpha_1 = 0.002
-        self.a = 1e-5
+        self.alpha_0 = -0.1
+        self.alpha_1 = 0.01
+        self.a = 2e-5
         self.b = -1e-5
         self.period = 1250
-        self.lr = 1e-4
+        self.lr = 1e-3
         self.dt = 8
         self.total_step = 1e6
         self.is_train = False
@@ -65,7 +66,7 @@ class Config():
         self.continue_train_episodes = 1000
 
         self.env = "Walker2d-v4"
-        self.num_test = 10
+        self.num_test = 20
         self.env_name="walker2d_tqc"
         #TODO change path
         self.logpath = "tensorboard/tqc_walker2d_tensorboard"
@@ -88,8 +89,10 @@ class Config():
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
         gradient = dill.load(f)
+        # gradient = torch.load(f, map_location=device)
     with open(weight_path, "rb") as f:
         weight = dill.load(f)
+        # weight = torch.load(f, map_location=device)
     # gm = preprocessing(gradient)
     # print(gradient)
     gn = [torch.abs(g * k1) for g in gradient]
@@ -99,7 +102,7 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env,render_mode="human")
+env = gym.make(para.env, render_mode='human')
 # env = gym.make(para.env)
 
 
@@ -212,7 +215,7 @@ else:
                 # print(reward_)
                 '''
 
-                model.actor.learn_dynamic(alpha)
+                model.actor.learn_dynamic(reward_diff, alpha)
                 episode_reward += reward
 
                 para.Trace["step_reward"].append(reward)
@@ -232,7 +235,7 @@ else:
                 #     plt.show()
 
                 #* step monitor
-                if step % 100 == 1.5:
+                if step % 100 == 1:
                     print("mu weight amp:%.7f, mu weight centre:%.7f, reward exp average:%.7f, alpha:%.7f" 
                           %(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"][3][200],
                             model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"][3][200],
