@@ -1,4 +1,3 @@
-import time
 
 import dill
 import gymnasium as gym
@@ -55,7 +54,7 @@ class Config():
         self.dt = 8
         self.total_step = 1e6
         self.is_train = False
-        self.is_continue_train = False
+        self.is_continue_train = True
         self.continue_train_episodes = 1000
 
         self.env = "Walker2d-v4"
@@ -96,9 +95,7 @@ episode_rewards = list()
 env = gym.make(para.env,render_mode="human")
 # env = gym.make(para.env)
 
-state_dim = env.observation_space.shape[0]
-critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
-critic_net.load_state_dict(torch.load("save_critic/{}_{}.pkl".format(para.env_name, para.total_step)))
+
 
 
 if para.is_train:
@@ -129,7 +126,7 @@ else:
             for _ in range(1000):
                 action, _state = model.predict(state, deterministic=True)
 
-                env.render()
+                # env.render()         
                 state, reward, done, _, _ = env.step(action)
                 episode_reward += reward
                 if done:
@@ -139,6 +136,9 @@ else:
         print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 
     if para.is_continue_train:
+        state_dim = env.observation_space.shape[0]
+        critic_net = Critic(state_dim=state_dim, device=device, hidden_dim=[8, 4])
+        critic_net.load_state_dict(torch.load("save_critic/{}_{}.pkl".format(para.env_name, para.total_step)))
         nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
         amp_init = calculate_amp_init(para.gradient_path, para.weight_path, para.k1, para.k2)
         model.actor.optimizer_dynamic = DynamicSynapse(model.actor.parameters(), lr=para.lr, amp=amp_init, period=para.period, dt=para.dt,
