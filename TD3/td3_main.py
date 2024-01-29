@@ -57,6 +57,7 @@ class Config():
         self.is_train = False
         self.is_continue_train = True
         self.continue_train_episodes = 1000
+        self.if_trace = 1
 
         self.env = "Walker2d-v4"
         self.num_test = 20
@@ -88,7 +89,7 @@ def ChooseContinueTracePath():
     if platform.node() == 'ubuntu':
         path='/home/user/Desktop/robot/ContinueTrace/'
     else:
-        path='ContinueTrace/'
+        path='/ContinueTrace/'
     if not os.path.exists(path):
         os.makedirs(path)        
     return path
@@ -224,17 +225,18 @@ else:
                 model.actor.learn_dynamic(reward_diff, alpha)
                 episode_reward += reward
 
-                para.Trace["step_reward"].append(reward)
-                # para.Trace["step_reward_average"].append(reward_average)
-                para.Trace["step_reward_target"].append(reward_target.detach().numpy())
-                para.Trace["alpha"].append(alpha)
-                para.Trace["reward_diff"].append(reward_diff)
-                para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
-                para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
-                # para.Trace["mu_weight"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight"].cpu().detach().numpy())
-                # para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
-                # para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
-                # para.Trace["critic_loss"].append(loss)
+                if para.if_trace and step % para.if_trace == 0:
+                    para.Trace["step_reward"].append(reward)
+                    # para.Trace["step_reward_average"].append(reward_average)
+                    para.Trace["step_reward_target"].append(reward_target.detach().numpy())
+                    para.Trace["alpha"].append(alpha)
+                    para.Trace["reward_diff"].append(reward_diff)
+                    para.Trace["mu_weight_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"].cpu().detach().numpy())
+                    para.Trace["mu_weight_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
+                    para.Trace["mu_weight"].append(model.actor.state_dict()["mu.4.weight"].cpu().detach().numpy())
+                    # para.Trace["mu_bias_amp"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["amp"].cpu().detach().numpy())
+                    # para.Trace["mu_bias_centre"].append(model.actor.optimizer_dynamic.state_dict()["state"][5]["weight_centre"].cpu().detach().numpy())
+                    # para.Trace["critic_loss"].append(loss)
 
                 # print(reward)
                 # if step == 10000:
@@ -247,7 +249,7 @@ else:
                     print("mu weight amp:%.7f, mu weight centre:%.7f, mu weight:%.7f, reward exp average:%.7f, alpha:%.7f" 
                           %(model.actor.optimizer_dynamic.state_dict()["state"][4]["amp"][3][200],
                             model.actor.optimizer_dynamic.state_dict()["state"][4]["weight_centre"][3][200],
-                            model.actor.optimizer_dynamic.state_dict()["state"][4]["weight"][3][200],
+                            model.actor.state_dict()["mu.4.weight"][3][200],
                             reward_average,
                             alpha))
 

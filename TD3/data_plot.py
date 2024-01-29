@@ -10,7 +10,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_td3_trace_continue_train_01-29_00-32-22'
+        self.trace_name = 'walker2d_td3_trace_continue_train_01-29_21-25-35'
         self.alpha_0 = -0.1
         self.alpha_1 = 0.01
         #TODO Change start episode & end episode to define which episode to be ploted, noted that episode start from 0
@@ -42,7 +42,7 @@ def ChooseContinueTracePath():
     if platform.node() == 'ubuntu':
         path='/home/user/Desktop/robot/ContinueTrace/'
     else:
-        path='ContinueTrace/'
+        path='/ContinueTrace/'
     if not os.path.exists(path):
         os.makedirs(path)        
     return path
@@ -165,9 +165,9 @@ ax[2].legend()
 # ax[3].grid(True)
 ax[3].plot(step, [data["mu_weight_centre"][j][i][ii_weight].tolist()  for j in range(len(data["step_reward"]))], 
            label='neuro{} to neuro{} weight centre'.format(ii_weight, i))
-# ax[3].plot(step, [data["mu_weight"][j][i][ii_weight].tolist()  for j in range(len(data["step_reward"]))], 
-#            linewidth=0.3,
-#            label='neuro{} to neuro{} weight'.format(ii_weight, i))
+ax[3].plot(step, [data["mu_weight"][j][i][ii_weight].tolist()  for j in range(len(data["step_reward"]))], 
+           linewidth=0.3,
+           label='neuro{} to neuro{} weight'.format(ii_weight, i))
 ax[3].fill_between(step, 
                    [data["mu_weight_centre"][j][i][ii_weight].tolist() + data["mu_weight_amp"][j][i][ii_weight].tolist() for j in range(len(data["step_reward"]))],
                    [data["mu_weight_centre"][j][i][ii_weight].tolist() - data["mu_weight_amp"][j][i][ii_weight].tolist() for j in range(len(data["step_reward"]))],

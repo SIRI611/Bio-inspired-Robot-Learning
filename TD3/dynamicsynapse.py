@@ -7,6 +7,12 @@ import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
 
+def f(t, period):
+    t = t % period
+    value = torch.where(t <= period / 4, t * 4 / period, t)
+    value = torch.where(torch.logical_and(t <= period * 3 / 4, t > period / 4), 2 - 4 / period * t, value)
+    value = torch.where(torch.logical_and(t <= period, t > period * 3 / 4), 4 / period * t - 4, value)
+    return value
 
 class DynamicSynapse(Optimizer):
 
@@ -219,6 +225,15 @@ class DynamicSynapse(Optimizer):
 
                 # weight = weight_centre *(1+ amp * torch.sin(t_in_period / period * 2 * math.pi))
                 weight = weight_centre + amp * torch.sin(t_in_period / period * 2 * math.pi)
+
+                # weight = weight_centre + amp * f(t_in_period, period)
+                # cpu_t_in_period = t_in_period.to('cpu')
+                # cpu_period = period.to('cpu')
+                # cpu_t_in_period.map_(cpu_period, f)
+                # value = cpu_t_in_period.to('cuda')
+                # weight = weight_centre + amp * value
+                # print(value.device)
+
                 # weight_centre_var = (weight - weight_centre) \
                 #                          * modulator_amount_osci * weight_centre_update_rate * group['dt'] * group['lr']
                 weight_centre_var = (weight - weight_centre) \
@@ -243,6 +258,7 @@ class DynamicSynapse(Optimizer):
                 if self.t % (1000 * dt) == self.dt * 0 and i == (len(group['params']) - 1):
                     self.a *= 0.9698
                     print('\n' + "=="*25 + " 1000 step " + "=="*25)
+                    # print(t_in_period[0])
                     print("a:%.11f, b:%.11f, beta:%.11f, a + beta:%.11f, b + beta:%.11f" 
                           %(self.a, self.b, beta.cpu().detach().numpy()[-1], self.a+beta.cpu().detach().numpy()[-1], self.b+beta.cpu().detach().numpy()[-1]))
                 # amp *= torch.exp(-weight_oscilate_decay * modulator_amount_osci * group['dt'] * group['lr'])
