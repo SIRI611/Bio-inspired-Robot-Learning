@@ -54,16 +54,16 @@ class Config():
         self.period = 1250
         self.lr = 1e-3
         self.dt = 8
-        self.total_step = 3e6
+        self.total_step = 1e6
         self.is_train = True
         self.is_continue_train = False
         self.continue_train_episodes = 1000
 
-        self.env = 'PandaSlide-v3'
+        self.env = 'PandaStack-v3'
         self.num_test = 20
-        self.env_name="pandaslide_tqc"
+        self.env_name="pandastack_tqc"
         #TODO change path
-        self.logpath = "tensorboard/tqc_pandaslide_tensorboard"
+        self.logpath = "tensorboard/tqc_pandastack_tensorboard"
         self.gradient_path = "save_gradient/humanoidstandup_tqc_abs_mean_gradient_600.pkl"
         self.weight_path = "save_weight/humanoidstandup_tqc_weight.pkl"
         self.Trace = {"step_reward": deque(),
