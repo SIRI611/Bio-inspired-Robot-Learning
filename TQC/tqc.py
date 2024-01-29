@@ -22,7 +22,7 @@ SelfTQC = TypeVar("SelfTQC", bound="TQC")
 def ChooseTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
         path='/home/robot/Documents/Trace/'
-    if platform.node() == 'DESKTOP-6S7M1IE':
+    elif platform.node() == 'DESKTOP-6S7M1IE':
         path='C:/Trace/'
     if platform.node() == 'ubuntu':
         path='/home/user/Desktop/robot/Trace/'
@@ -167,7 +167,8 @@ class TQC(OffPolicyAlgorithm):
         self.step = 0
         self.total_step = total_step
         self.trace_num = trace_num
-        self.trace_path = ChooseTracePath() + "trace_"+env_name+"_"+str(total_step)+".pkl"
+        self.env_name = env_name
+        self.trace_path =  "trace/trace_"+env_name+"_"+str(total_step)+".pkl"
 
         if _init_setup_model:
             self._setup_model()
@@ -306,6 +307,7 @@ class TQC(OffPolicyAlgorithm):
                         self.actor.Trace["gradient"].append(param.grad)
 
             if self.step == self.total_step - self.learning_starts:
+                # self.trace_path = ChooseTracePath() + "trace_"+self.env_name+"_"+str(self.total_step)+".pkl"
                 with open(self.trace_path, 'wb') as f:
                     dill.dump(self.actor.Trace, f) 
 

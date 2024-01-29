@@ -11,16 +11,16 @@ from tqc import TQC
 
 
 class Config():
-    env = "Walker2d-v4"
-    env_name = "walker2d_tqc"
-    total_step=1e6
+    env = "Humanoid-v4"
+    env_name = "humanoid_tqc"
+    total_step=2e6
     num_test = 10
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
 
 para = Config()
 model = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
-env = gym.make(para.env)
+env = gym.make(para.env, render_mode="human")
 state_dim = env.observation_space.shape[0]
 critic_net = Critic(state_dim=state_dim, device=para.device, hidden_dim=[8, 4])
 
