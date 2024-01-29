@@ -64,7 +64,7 @@ class Config():
         self.env_name="pandaslide_tqc"
         #TODO change path
         self.logpath = "tensorboard/tqc_pandaslide_tensorboard"
-        self.gradient_path = "save_gradient/humanoidstandup_tqc_max_gradient_600.pkl"
+        self.gradient_path = "save_gradient/humanoidstandup_tqc_abs_mean_gradient_600.pkl"
         self.weight_path = "save_weight/humanoidstandup_tqc_weight.pkl"
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
@@ -103,15 +103,15 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
         # weight = torch.load(f, map_location=device)
     # gm = preprocessing(gradient)
     # print(gradient)
-    gn = [torch.abs(g * k1) for g in gradient]
-    wn = [torch.abs(w * k2) for w in weight]
-    amp_init = [gn[i] + wn[i] for i in range(len(gn))]
+    gn = [1/(g.mean()+g) for g in gradient]
+    wn = [w for w in weight]
+    amp_init = [gn[i]*k1 + wn[i]*k2 for i in range(len(gn))]
     return amp_init
 
 para = Config()
 episode_rewards = list()
 # env = gym.make(para.env, render_mode='human')
-env = gym.make(para.env)
+env = gym.make(para.env, render_mode="human")
 
 if para.is_train:
     # model = TQC("MultiInputPolicy", env, 
@@ -133,7 +133,8 @@ if para.is_train:
                 replay_buffer_class = HerReplayBuffer,
                 replay_buffer_kwargs=dict(goal_selection_strategy='future',n_sampled_goal=4),
                 policy_kwargs=dict(net_arch=[64, 64], n_critics=1),
-                tensorboard_log=para.logpath)
+                tensorboard_log=para.logpath,
+                verbose=1)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
     model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
