@@ -9,13 +9,14 @@ from tqc import TQC
 import os
 # torch.set_printoptions(precision=16)
 # torch.set_default_dtype(torch.float64)
-
+import panda_gym
 np.set_printoptions(threshold=np.inf)
 # range_adapter = RangeAdapter()
 # range_adapter.init_recording()
 from dynamicsynapse import DynamicSynapse
 from Adapter.RangeAdapter import RangeAdapter
 from collections import deque
+from stable_baselines3.her.her_replay_buffer import HerReplayBuffer
 # def closure(r):
 #     def a():
 #         # out = adapter.step_dynamics(dt, r)
@@ -62,18 +63,18 @@ class Config():
         self.period = 1250
         self.lr = 1e-3
         self.dt = 8
-        self.total_step = 1e6
-        self.is_train = False
-        self.is_continue_train = True
+        self.total_step = 3e6
+        self.is_train = True
+        self.is_continue_train = False
         self.continue_train_episodes = 1000
 
-        self.env = "Walker2d-v4"
+        self.env = 'PandaSlide-v3'
         self.num_test = 20
-        self.env_name="walker2d_tqc"
+        self.env_name="pandaslide_tqc"
         #TODO change path
-        self.logpath = "tensorboard/tqc_walker2d_tensorboard"
-        self.gradient_path = "save_gradient/walker2d_tqc_max_gradient_600.pkl"
-        self.weight_path = "save_weight/walker2d_tqc_weight.pkl"
+        self.logpath = "tensorboard/tqc_pandaslide_tensorboard"
+        self.gradient_path = "save_gradient/humanoidstandup_tqc_max_gradient_600.pkl"
+        self.weight_path = "save_weight/humanoidstandup_tqc_weight.pkl"
         self.Trace = {"step_reward": deque(),
                       "step_reward_average": deque(),
                       "step_reward_target":deque(),
@@ -112,12 +113,26 @@ env = gym.make(para.env, render_mode='human')
 
 
 if para.is_train:
-    model = TQC("MlpPolicy", env, 
+    # model = TQC("MultiInputPolicy", env, 
+    #             total_step=para.total_step, 
+    #             learning_starts=10000, 
+    #             tensorboard_log=para.logpath, 
+    #             env_name=para.env_name,
+    #             verbose=1)
+
+    model = TQC('MultiInputPolicy', env,
                 total_step=para.total_step, 
-                learning_starts=10000, 
-                tensorboard_log=para.logpath, 
-                env_name=para.env_name,
-                verbose=1)
+                buffer_size=1000000, 
+                ent_coef='auto',
+                batch_size=256,
+                gamma=0.95,
+                learning_rate=0.001,
+                learning_starts=1000,
+                # normalize=True,
+                replay_buffer_class = HerReplayBuffer,
+                replay_buffer_kwargs=dict(goal_selection_strategy='future',n_sampled_goal=4),
+                policy_kwargs=dict(net_arch=[64, 64], n_critics=1),
+                tensorboard_log=para.logpath)
     
     model.learn(total_timesteps=para.total_step, log_interval=4)
     model.save("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
