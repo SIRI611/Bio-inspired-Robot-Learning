@@ -14,6 +14,13 @@ def f(t, period):
     value = torch.where(torch.logical_and(t <= period, t > period * 3 / 4), 4 / period * t - 4, value)
     return value
 
+def Tan(t, period):
+    t = t % period
+    value = torch.where(t <= period / 4, torch.tan((t/period)*math.pi), t)
+    value = torch.where(torch.logical_and(t <= period * 3 / 4, t > period / 4), -torch.tan((t/period - 1/2)*math.pi), value)
+    value = torch.where(torch.logical_and(t <= period, t > period * 3 / 4), torch.tan((t/period - 1)*math.pi), value)
+    return value
+
 class DynamicSynapse(Optimizer):
 
     def __init__(self, params, lr=1e-3, period=None, t_in_period=None, period_var=0.1, amp=1,
@@ -224,15 +231,10 @@ class DynamicSynapse(Optimizer):
                 t_in_period += group['dt']
 
                 # weight = weight_centre *(1+ amp * torch.sin(t_in_period / period * 2 * math.pi))
-                weight = weight_centre + amp * torch.sin(t_in_period / period * 2 * math.pi)
-
+                # TODO Change oscillating way
+                # weight = weight_centre + amp * torch.sin(t_in_period / period * 2 * math.pi)
                 # weight = weight_centre + amp * f(t_in_period, period)
-                # cpu_t_in_period = t_in_period.to('cpu')
-                # cpu_period = period.to('cpu')
-                # cpu_t_in_period.map_(cpu_period, f)
-                # value = cpu_t_in_period.to('cuda')
-                # weight = weight_centre + amp * value
-                # print(value.device)
+                weight = weight_centre + amp * Tan(t_in_period, period)
 
                 # weight_centre_var = (weight - weight_centre) \
                 #                          * modulator_amount_osci * weight_centre_update_rate * group['dt'] * group['lr']

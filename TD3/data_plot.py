@@ -10,7 +10,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_td3_trace_continue_train_01-29_21-25-35'
+        self.trace_name = 'walker2d_td3_trace_continue_train_01-29_22-23-55'
         self.alpha_0 = -0.1
         self.alpha_1 = 0.01
         #TODO Change start episode & end episode to define which episode to be ploted, noted that episode start from 0
@@ -183,8 +183,8 @@ ax[3].legend()
 #                    alpha=0.5)
 # ax[4].legend()
 
-xticks = np.arange(step[0], step[-1], 10000)
-plt.xticks(xticks)
+# xticks = np.arange(step[0], step[-1], 10000)
+# plt.xticks(xticks)
 
 if not os.path.exists('continue_train_fig/'):
     os.makedirs('continue_train_fig/')
