@@ -5,6 +5,8 @@ import numpy as np
 import torch as th
 from gymnasium import spaces
 from torch.nn import functional as F
+import platform
+import os
 import dill
 
 from stable_baselines3.common.buffers import ReplayBuffer
@@ -17,6 +19,18 @@ from policies import Actor, CnnPolicy, MlpPolicy, MultiInputPolicy, TD3Policy
 
 SelfTD3 = TypeVar("SelfTD3", bound="TD3")
 
+def ChooseTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/Trace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/Trace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/Trace/'
+    else:
+        path='Trace/'
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 
 class TD3(OffPolicyAlgorithm):
     """
@@ -140,7 +154,7 @@ class TD3(OffPolicyAlgorithm):
         self.step = 0
         self.total_step = total_step
         self.trace_num = trace_num
-        self.trace_path = "trace/trace_"+env_name+"_"+str(total_step)+".pkl"
+        self.trace_path = ChooseTracePath() + "trace_"+env_name+"_"+str(total_step)+".pkl"
 
         if _init_setup_model:
             self._setup_model()

@@ -4,6 +4,7 @@ import dill
 import gymnasium as gym
 import numpy as np
 import torch
+import os
 
 from critic import Critic
 from tqc import TQC
@@ -19,15 +20,15 @@ class Config():
 
 para = Config()
 model = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
-env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 state_dim = env.observation_space.shape[0]
 critic_net = Critic(state_dim=state_dim, device=para.device, hidden_dim=[8, 4])
 
 loss_list = list()
-for _ in range(para.num_test):    
+for i in range(para.num_test):    
     state = env.reset()[0]
     episode_reward = 0
-
+    loss_list.clear()
     for _ in range(1000):
         action, _state = model.predict(state, deterministic=True)
 
@@ -41,7 +42,10 @@ for _ in range(para.num_test):
         # loss = critic_net.learn()
         if done:
             break
-# print(loss_list) 
+# print(loss_list)
+    print(i, np.mean(loss_list))
+if not os.path.exists('save_critic/'):
+    os.makedirs('save_critic/')
 savepath = "save_critic/{}_{}.pkl".format(para.env_name, para.total_step)
 torch.save(critic_net.state_dict(), savepath)
             

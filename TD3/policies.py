@@ -18,11 +18,11 @@ from stable_baselines3.common.torch_layers import (
 from stable_baselines3.common.type_aliases import Schedule
 
 adapter = RangeAdapter()
-def closure(r, dt):
+def closure(r, r_, dt):
     def a():
         # out = adapter.step_dynamics(dt, r)
         # adapter.update()
-        return r
+        return r, r_
     return a
 
 class Actor(BasePolicy):
@@ -93,8 +93,8 @@ class Actor(BasePolicy):
         # Note: the deterministic deterministic parameter is ignored in the case of TD3.
         #   Predictions are always deterministic.
         return self(observation)
-    def learn_dynamic(self, r):
-        self.optimizer_dynamic.step(closure=closure(r, dt=15)) 
+    def learn_dynamic(self, reward, alpha):
+        self.optimizer_dynamic.step(closure=closure(reward, alpha,  dt=15)) 
 
 
 class TD3Policy(BasePolicy):

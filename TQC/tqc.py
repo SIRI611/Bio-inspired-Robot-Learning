@@ -24,11 +24,14 @@ def ChooseTracePath():
         path='/home/robot/Documents/Trace/'
     elif platform.node() == 'DESKTOP-6S7M1IE':
         path='C:/Trace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/Trace/'
     else:
-        path=''
+        path='Trace/'
     if not os.path.exists(path):
         os.makedirs(path)        
     return path
+
 class TQC(OffPolicyAlgorithm):
     """
 

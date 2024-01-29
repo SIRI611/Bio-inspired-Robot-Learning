@@ -30,18 +30,9 @@ from stable_baselines3.her.her_replay_buffer import HerReplayBuffer
 #         li = (li - torch.mean(li)) / torch.std(li)
     # return data
 
-# device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
-device = torch.device("cpu")
-def ChooseContinueTracePath():
-    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
-        path='/home/robot/Documents/ContinueTrace/'
-    if platform.node() == 'DESKTOP-6S7M1IE':
-        path='C:/ContinueTrace/'
-    else:
-        path=''
-    if not os.path.exists(path):
-        os.makedirs(path)        
-    return path
+device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+# device = torch.device("cpu")
+
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.005
@@ -82,6 +73,7 @@ class Config():
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
+                      "mu_weight":deque(),
                       "mu_weight_amp": deque(),
                       "mu_weight_centre":deque(),
                       "mu_bias_amp": deque(),
@@ -89,6 +81,18 @@ class Config():
                       "critic_loss":deque(),
                       "episode_step":deque()}
         
+def ChooseContinueTracePath():
+    if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
+        path='/home/robot/Documents/ContinueTrace/'
+    if platform.node() == 'DESKTOP-6S7M1IE':
+        path='C:/ContinueTrace/'
+    if platform.node() == 'ubuntu':
+        path='/home/user/Desktop/robot/ContinueTrace/'
+    else:
+        path='ContinueTrace/'
+    if not os.path.exists(path):
+        os.makedirs(path)        
+    return path
 
 def calculate_amp_init(gradient_path, weight_path, k1, k2):
     with open(gradient_path, "rb") as f:
@@ -106,11 +110,8 @@ def calculate_amp_init(gradient_path, weight_path, k1, k2):
 
 para = Config()
 episode_rewards = list()
-env = gym.make(para.env, render_mode='human')
-# env = gym.make(para.env)
-
-
-
+# env = gym.make(para.env, render_mode='human')
+env = gym.make(para.env)
 
 if para.is_train:
     # model = TQC("MultiInputPolicy", env, 
@@ -188,6 +189,7 @@ else:
                       "alpha": deque(),
                       "episode_reward":deque(),
                       "episode_reward_average":deque(),
+                      "mu_weight":deque(),
                       "mu_weight_amp": deque(),
                       "mu_weight_centre":deque(),
                       "mu_bias_amp":deque(),
@@ -277,7 +279,7 @@ else:
             # print("weight centre:%.7f" %(model.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'][3][200]))
             print("oscillate amp:")
             print(model.actor.optimizer_dynamic.state_dict()['state'][4]['amp'])
-             
+
         model.save("save_model/continue_train_{}_{}.pkl".format(para.env_name, para.continue_train_episodes))
 # with open("trace.pkl", "rb") as f:
 #     trace = dill.load(f)
