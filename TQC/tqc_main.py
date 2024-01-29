@@ -179,7 +179,7 @@ else:
         
         for episode_idx in range(para.continue_train_episodes):
             if episode_idx % 5 == 1:
-                with open(ChooseContinueTracePath() + "{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "ab") as f:
+                with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(para.env_name, nowtime), "ab") as f:
                     dill.dump(para.Trace, f, protocol=dill.HIGHEST_PROTOCOL)
                 # reset Trace
                 para.Trace = {"step_reward": deque(),

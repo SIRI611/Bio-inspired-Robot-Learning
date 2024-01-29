@@ -1,6 +1,2 @@
-/TQC/trace*
-/TD3/trace*
-/SAC/trace*
-/TQC/*__pycache__
-/TD3/*__pycache__
-/SAC/*__pycache__
+*trace*
+*__pycache__

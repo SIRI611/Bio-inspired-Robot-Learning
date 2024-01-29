@@ -168,7 +168,7 @@ class TQC(OffPolicyAlgorithm):
         self.total_step = total_step
         self.trace_num = trace_num
         self.env_name = env_name
-        self.trace_path = ChooseTracePath() + "trace_"+env_name+"_"+str(total_step)+".pkl"
+        self.trace_path =  "trace/trace_"+env_name+"_"+str(total_step)+".pkl"
 
         if _init_setup_model:
             self._setup_model()
@@ -307,7 +307,7 @@ class TQC(OffPolicyAlgorithm):
                         self.actor.Trace["gradient"].append(param.grad)
 
             if self.step == self.total_step - self.learning_starts:
-                self.trace_path = ChooseTracePath() + "trace_"+self.env_name+"_"+str(self.total_step)+".pkl"
+                # self.trace_path = ChooseTracePath() + "trace_"+self.env_name+"_"+str(self.total_step)+".pkl"
                 with open(self.trace_path, 'wb') as f:
                     dill.dump(self.actor.Trace, f) 
 
