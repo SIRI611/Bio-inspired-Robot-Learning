@@ -21,7 +21,7 @@ class Critic(nn.Module):
             [nn.Linear(dim_in, dim_out) for dim_in, dim_out in zip(self.dim_list[:-1], self.dim_list[1:])]
         )
         
-        self.activation = nn.ReLU()
+        self.activation = nn.Sigmoid()
 
 
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
@@ -31,7 +31,7 @@ class Critic(nn.Module):
     
     def weights_init_(self, m):
         if isinstance(m, nn.Linear):
-            torch.nn.init.xavier_uniform_(m.weight, gain=1)
+            torch.nn.init.sparse_(m.weight, sparsity=0.1)
             torch.nn.init.constant_(m.bias, 0)
 
 

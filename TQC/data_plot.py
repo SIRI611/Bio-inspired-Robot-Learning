@@ -10,7 +10,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'walker2d_tqc_trace_continue_train_01-29_01-54-56'
+        self.trace_name = 'humanoid_tqc_trace_continue_train_01-29_17-35-19'
         self.alpha_0 = -0.1
         self.alpha_1 = 0.01
         #TODO Change start episode & end episode to define which episode to be ploted, noted that episode start from 0
@@ -118,9 +118,8 @@ def WherePlot(data, start_episode=None, end_episode=None):
 
 #* initialize
 para = Config()
-aTR = TraceReader(log_file_path=ChooseContinueTracePath() + para.trace_name + '.pkl')
+aTR = TraceReader(log_file_path="trace_continue_train/" + para.trace_name + '.pkl')
 data = aTR.get_trace()
-
 data, step, episode, single = WherePlot(data, para.start_plot_episode, para.end_plot_episode)
 
 i = para.i
