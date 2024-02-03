@@ -4,7 +4,7 @@ from tqc.functions import quantile_huber_loss_f
 from tqc import DEVICE
 from tqc.dynamicsynapse import DynamicSynapse
 import dill
-nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
+# nowtime = time.strftime("%m-%d_%H-%M-%S", time.localtime())
 
 def closure(r):
     def a():
@@ -189,7 +189,7 @@ class Trainer(object):
 
 		self.total_it += 1
 
-	def save(self, filename):
+	def save(self, filename, nowtime):
 		filename = str(filename)
 		torch.save(self.critic.state_dict(), filename + "_critic" + nowtime)
 		torch.save(self.critic_target.state_dict(), filename + "_critic_target"+ nowtime)
@@ -203,15 +203,15 @@ class Trainer(object):
 		torch.save(self.alpha_optimizer.state_dict(), filename + "_alpha_optimizer"+ nowtime)
 		
 
-	def load(self, filename, time_):
+	def load(self, filename, logtime):
 		filename = str(filename)
-		self.critic.load_state_dict(torch.load(filename + "_critic"+time_))
-		self.critic_target.load_state_dict(torch.load(filename + "_critic_target"+time_))
-		self.critic_optimizer.load_state_dict(torch.load(filename + "_critic_optimizer"+time_))
-		self.actor.load_state_dict(torch.load(filename + "_actor"+time_))
-		self.actor_optimizer.load_state_dict(torch.load(filename + "_actor_optimizer"+time_))
-		self.log_alpha = torch.load(filename + '_log_alpha'+time_)
-		self.alpha_optimizer.load_state_dict(torch.load(filename + "_alpha_optimizer"+time_))
-		self.critic_value.load_state_dict(torch.load(filename + "_critic_value"+time_))
-		self.critic_value_target.load_state_dict(torch.load(filename + "_critic_value_target"+time_))
-		self.critic_value_optimizer.load_state_dict(torch.load(filename + "_critic_value_optimizer"+time_))	
+		self.critic.load_state_dict(torch.load(filename + "_critic"+logtime))
+		self.critic_target.load_state_dict(torch.load(filename + "_critic_target"+logtime))
+		self.critic_optimizer.load_state_dict(torch.load(filename + "_critic_optimizer"+logtime))
+		self.actor.load_state_dict(torch.load(filename + "_actor"+logtime))
+		self.actor_optimizer.load_state_dict(torch.load(filename + "_actor_optimizer"+logtime))
+		self.log_alpha = torch.load(filename + '_log_alpha'+logtime)
+		self.alpha_optimizer.load_state_dict(torch.load(filename + "_alpha_optimizer"+logtime))
+		self.critic_value.load_state_dict(torch.load(filename + "_critic_value"+logtime))
+		self.critic_value_target.load_state_dict(torch.load(filename + "_critic_value_target"+logtime))
+		self.critic_value_optimizer.load_state_dict(torch.load(filename + "_critic_value_optimizer"+logtime))	

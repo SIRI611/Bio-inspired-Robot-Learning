@@ -12,6 +12,7 @@ from tqc.trainer import Trainer
 from tqc.structures import Actor, Critic, RescaleAction, Critic_Value
 from tqc.dynamicsynapse import DynamicSynapse
 from tqc.functions import eval_policy
+from collections import deque
 
 
 EPISODE_LENGTH = 1000
@@ -31,7 +32,7 @@ def calculate_amp_init(gradient_path, weight_path, k1=0.001, k2=0.002):
     amp_init = [gn[i]*k1 + wn[i]*k2 for i in range(len(gn))]
     return amp_init
 
-def pretrain(args, results_dir, models_dir, trace_dir, prefix):
+def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
     # --- Init ---
 
     # remove TimeLimit
@@ -97,12 +98,25 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix):
 
     file_name = f"{prefix}_{args.env}_{args.seed}"
     if args.save_model: 
-        trainer.save(models_dir / file_name)
+        trainer.save(models_dir / file_name, nowtime)
         with open("models/replay_buffer.pkl", "wb") as f:
             dill.dump(replay_buffer, f)
 
-def continue_train(args, models_dir, prefix, time_):
-
+def continue_train(args, models_dir, prefix, logtime, nowtime):
+    Trace = {"step_reward": deque(),
+                "step_reward_average": deque(),
+                "step_reward_target":deque(),
+                "reward_diff":deque(),
+                      "alpha": deque(),
+                      "episode_reward":deque(),
+                      "episode_reward_average":deque(),
+                      "mu_weight":deque(),
+                      "mu_weight_amp": deque(),
+                      "mu_weight_centre":deque(),
+                      "mu_bias_amp": deque(),
+                      "mu_bias_centre":deque(),
+                      "critic_loss":deque(),
+                      "episode_step":deque()}
     env = gym.make(args.env).unwrapped
     eval_env = gym.make(args.env).unwrapped
 
@@ -133,8 +147,9 @@ def continue_train(args, models_dir, prefix, time_):
                       tau=args.tau,
                       target_entropy=-np.prod(env.action_space.shape).item(),
                       trace_path = None)
+    
     file_name = f"{prefix}_{args.env}_{args.seed}"
-    trainer.load(models_dir / file_name, time_)
+    trainer.load(models_dir / file_name, logtime)
     amp_init = calculate_amp_init(gradient_path="save_gradient/humanoid_tqc_mean_gradient_600.pkl",
                                   weight_path="save_weight/humanoid_tqc_weight.pkl")
     trainer.dynamic_optimizer = DynamicSynapse(trainer.actor.parameters(), amp=amp_init)
@@ -145,7 +160,7 @@ def continue_train(args, models_dir, prefix, time_):
     episode_num = 0
 
     actor.train()
-    for t in range(int(args.max_timesteps)):
+    for t in range(int(args.continue_timesteps)):
 
         action = actor.select_action(state)
         next_state, reward, done, _, info = env.step(action)
@@ -169,7 +184,7 @@ def continue_train(args, models_dir, prefix, time_):
             episode_num += 1
     
     if args.save_model: 
-        trainer.save(models_dir / file_name)
+        trainer.save(models_dir / file_name, nowtime)
 
     #     # Evaluate episode
     #     if (t + 1) % args.eval_freq == 0:
@@ -207,6 +222,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", default="Humanoid-v4")          # OpenAI gym environment name
     parser.add_argument("--eval_freq", default=5e4, type=int)       # How often (time steps) we evaluate
     parser.add_argument("--max_timesteps", default=2e6, type=int)   # Max time steps to run environment
+    parser.add_argument("--continue_timesteps", default=5e5, type=int)
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--n_quantiles", default=25, type=int)
     parser.add_argument("--top_quantiles_to_drop_per_net", default=2, type=int)
@@ -240,9 +256,10 @@ if __name__ == "__main__":
         os.makedirs(continue_train_models_dir)
 
     if args.is_train == True:
-        pretrain(args, results_dir, models_dir, trace_dir, args.prefix)
+        pretrain(args, results_dir, models_dir, trace_dir, args.prefix, nowtime)
     elif args.is_continue_train == True:
-        continue_train(args, models_dir=continue_train_models_dir, prefix=args.prefix)
+        logtime = ''
+        continue_train(args, models_dir=continue_train_models_dir, prefix=args.prefix, logtime=logtime, nowtime=nowtime)
     else:
         evaluate_policy(args, models_dir, args.prefix)
 
