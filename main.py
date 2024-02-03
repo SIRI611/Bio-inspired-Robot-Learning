@@ -32,9 +32,8 @@ def calculate_amp_init(gradient_path, weight_path, k1=0.001, k2=0.002):
     amp_init = [gn[i]*k1 + wn[i]*k2 for i in range(len(gn))]
     return amp_init
 
-def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
-    # --- Init ---
-
+def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
+    episode_return_list = []
     # remove TimeLimit
     env = gym.make(args.env).unwrapped
     eval_env = gym.make(args.env).unwrapped
@@ -49,6 +48,7 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
     actor = Actor(state_dim, action_dim).to(DEVICE)
     critic = Critic(state_dim, action_dim, args.n_quantiles, args.n_nets).to(DEVICE)
     critic_value = Critic_Value(state_dim, args.n_quantiles, args.n_nets).to(DEVICE)
+
     critic_target = copy.deepcopy(critic)
     critic_value_target = copy.deepcopy(critic_value)
 
@@ -70,10 +70,10 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
     episode_timesteps = 0
     episode_num = 0
 
-    actor.train()
+    trainer.actor.train()
     for t in range(int(args.max_timesteps)):
 
-        action = actor.select_action(state)
+        action = trainer.actor.select_action(state)
         next_state, reward, done, _, info = env.step(action)
         episode_timesteps += 1
 
@@ -91,7 +91,7 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
             print(f"Total T: {t + 1} Episode Num: {episode_num + 1} Episode T: {episode_timesteps} Reward: {episode_return:.3f}")
             # Reset environment
             state, done = env.reset()[0], False
-
+            episode_return_list.append(episode_return)
             episode_return = 0
             episode_timesteps = 0
             episode_num += 1
@@ -99,23 +99,20 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix, nowtime):
     file_name = f"{prefix}_{args.env}_{args.seed}"
     if args.save_model: 
         trainer.save(models_dir / file_name, nowtime)
-        with open("models/replay_buffer.pkl", "wb") as f:
+        with open(models_dir / "replay_buffer.pkl", "wb") as f:
             dill.dump(replay_buffer, f)
+        with open(results_dir / "episode_return.pkl") as f:
+            dill.dump(episode_return_list, f)
 
 def continue_train(args, models_dir, prefix, logtime, nowtime):
     Trace = {"step_reward": deque(),
-                "step_reward_average": deque(),
-                "step_reward_target":deque(),
-                "reward_diff":deque(),
-                      "alpha": deque(),
+                "advantage":deque(),
                       "episode_reward":deque(),
-                      "episode_reward_average":deque(),
                       "mu_weight":deque(),
                       "mu_weight_amp": deque(),
                       "mu_weight_centre":deque(),
-                      "mu_bias_amp": deque(),
-                      "mu_bias_centre":deque(),
-                      "critic_loss":deque(),
+                    #   "mu_bias_amp": deque(),
+                    #   "mu_bias_centre":deque(),
                       "episode_step":deque()}
     env = gym.make(args.env).unwrapped
     eval_env = gym.make(args.env).unwrapped
@@ -150,6 +147,7 @@ def continue_train(args, models_dir, prefix, logtime, nowtime):
     
     file_name = f"{prefix}_{args.env}_{args.seed}"
     trainer.load(models_dir / file_name, logtime)
+
     amp_init = calculate_amp_init(gradient_path="save_gradient/humanoid_tqc_mean_gradient_600.pkl",
                                   weight_path="save_weight/humanoid_tqc_weight.pkl")
     trainer.dynamic_optimizer = DynamicSynapse(trainer.actor.parameters(), amp=amp_init)
@@ -159,29 +157,38 @@ def continue_train(args, models_dir, prefix, logtime, nowtime):
     episode_timesteps = 0
     episode_num = 0
 
-    actor.train()
+    trainer.actor.train()
     for t in range(int(args.continue_timesteps)):
 
-        action = actor.select_action(state)
+        action = trainer.actor.select_action(state)
         next_state, reward, done, _, info = env.step(action)
         episode_timesteps += 1
-
+        Trace["step_reward"].append(reward)
         replay_buffer.add(state, action, next_state, reward, done)
 
         state = next_state
         episode_return += reward
         # Train agent after collecting sufficient data
-        trainer.continue_train(replay_buffer, args.batch_size)
-
+        trainer.continue_train(replay_buffer, args.batch_size, Trace)
+        Trace["mu_weight_amp"].append(trainer.dynamic_optimizer.state_dict()["state"][4]["amp"].cpu().detach().numpy())
+        Trace["mu_weight_centre"].append(trainer.dynamic_optimizer.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
+        
         if done or episode_timesteps >= EPISODE_LENGTH:
             # +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True
             print(f"Total T: {t + 1} Episode Num: {episode_num + 1} Episode T: {episode_timesteps} Reward: {episode_return:.3f}")
             # Reset environment
             state, done = env.reset()[0], False
-
+            Trace["episode_reward"].append(episode_return)
+            Trace["episode_step"].append(episode_timesteps)
             episode_return = 0
             episode_timesteps = 0
             episode_num += 1
+
+            if episode_num % 5 == 1:
+                with open("trace_continue_train/{}_trace_continue_train_{}.pkl".format(args.env, nowtime), "ab") as f:
+                    dill.dump(Trace, f, protocol=dill.HIGHEST_PROTOCOL)
+                    for key in Trace:
+                        Trace[key].clear()
     
     if args.save_model: 
         trainer.save(models_dir / file_name, nowtime)
@@ -227,13 +234,13 @@ if __name__ == "__main__":
     parser.add_argument("--n_quantiles", default=25, type=int)
     parser.add_argument("--top_quantiles_to_drop_per_net", default=2, type=int)
     parser.add_argument("--n_nets", default=5, type=int)
-    parser.add_argument("--batch_size", default=64, type=int)      # Batch size for both actor and critic
+    parser.add_argument("--batch_size", default=256, type=int)      # Batch size for both actor and critic
     parser.add_argument("--discount", default=0.99, type=float)                 # Discount factor
     parser.add_argument("--tau", default=0.005, type=float)                     # Target network update rate
     parser.add_argument("--log_dir", default='.')
     parser.add_argument("--prefix", default='')
     parser.add_argument("--save_model", default=True, action="store_true")
-    parser.add_argument("--is_train", default=False)        # Save model and optimizer parameters
+    parser.add_argument("--is_train", default=True)        # Save model and optimizer parameters
     parser.add_argument("--is_continue_train", default=False)
     args = parser.parse_args()
 

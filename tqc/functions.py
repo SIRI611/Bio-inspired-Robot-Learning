@@ -5,7 +5,7 @@ from tqc import DEVICE
 
 def eval_policy(policy, eval_env, max_episode_steps, eval_episodes=10):
     policy.eval()
-    avg_reward = 0.
+    avg_reward = 0
     episode_reward_list = list()
     episode_reward = 0
     for _ in range(eval_episodes):

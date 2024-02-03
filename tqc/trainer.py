@@ -126,7 +126,7 @@ class Trainer(object):
 		self.total_it += 1
 		# print(self.total_it)
 	
-	def continue_train(self, replay_buffer, batch_size=256):
+	def continue_train(self, replay_buffer, batch_size, trace):
 		state, action, next_state, reward, not_done = replay_buffer.sample(batch_size)
 		alpha = torch.exp(self.log_alpha)
 
@@ -161,7 +161,8 @@ class Trainer(object):
 		alpha_loss = -self.log_alpha * (log_pi + self.target_entropy).detach().mean()
 		# actor_loss = (alpha * log_pi - self.critic(state, new_action).mean(2).mean(1, keepdim=True)).mean()
 		actor_loss = (cur_z - cur_z_value).reshape(batch_size, -1).mean().cpu().detach()
-
+		
+		trace["advantage"].append(actor_loss)
 		# --- Update ---
 		self.critic_optimizer.zero_grad()
 		critic_loss.backward()
