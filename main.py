@@ -101,7 +101,7 @@ def pretrain(args, results_dir, models_dir, trace_dir, prefix):
         with open("models/replay_buffer.pkl", "wb") as f:
             dill.dump(replay_buffer, f)
 
-def continue_train(args, models_dir, prefix):
+def continue_train(args, models_dir, prefix, time_):
 
     env = gym.make(args.env).unwrapped
     eval_env = gym.make(args.env).unwrapped
@@ -134,11 +134,11 @@ def continue_train(args, models_dir, prefix):
                       target_entropy=-np.prod(env.action_space.shape).item(),
                       trace_path = None)
     file_name = f"{prefix}_{args.env}_{args.seed}"
-    trainer.load(models_dir / file_name)
+    trainer.load(models_dir / file_name, time_)
     amp_init = calculate_amp_init(gradient_path="save_gradient/humanoid_tqc_mean_gradient_600.pkl",
                                   weight_path="save_weight/humanoid_tqc_weight.pkl")
     trainer.dynamic_optimizer = DynamicSynapse(trainer.actor.parameters(), amp=amp_init)
-    evaluations = []
+    # evaluations = []
     state, done = env.reset()[0], False
     episode_return = 0
     episode_timesteps = 0
@@ -167,7 +167,9 @@ def continue_train(args, models_dir, prefix):
             episode_return = 0
             episode_timesteps = 0
             episode_num += 1
-        
+    
+    if args.save_model: 
+        trainer.save(models_dir / file_name)
 
     #     # Evaluate episode
     #     if (t + 1) % args.eval_freq == 0:
@@ -233,10 +235,14 @@ if __name__ == "__main__":
     if not os.path.exists(trace_dir):
         os.makedirs(trace_dir)
 
+    continue_train_models_dir = log_dir / 'save_continue_train'
+    if args.save_model and not os.path.exists(continue_train_models_dir):
+        os.makedirs(continue_train_models_dir)
+
     if args.is_train == True:
         pretrain(args, results_dir, models_dir, trace_dir, args.prefix)
     elif args.is_continue_train == True:
-        continue_train(args, models_dir=models_dir, prefix=args.prefix)
+        continue_train(args, models_dir=continue_train_models_dir, prefix=args.prefix)
     else:
         evaluate_policy(args, models_dir, args.prefix)
 
