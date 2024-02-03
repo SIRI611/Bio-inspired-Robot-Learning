@@ -31,7 +31,7 @@ def calculate_amp_init(gradient_path, weight_path, k1=0.001, k2=0.002):
     amp_init = [gn[i]*k1 + wn[i]*k2 for i in range(len(gn))]
     return amp_init
 
-def main(args, results_dir, models_dir, trace_dir, prefix):
+def pretrain(args, results_dir, models_dir, trace_dir, prefix):
     # --- Init ---
 
     # remove TimeLimit
@@ -45,9 +45,9 @@ def main(args, results_dir, models_dir, trace_dir, prefix):
     action_dim = env.action_space.shape[0]
 
     replay_buffer = structures.ReplayBuffer(state_dim, action_dim)
-    actor = Actor(state_dim, action_dim).cuda()
-    critic = Critic(state_dim, action_dim, args.n_quantiles, args.n_nets).cuda()
-    critic_value = Critic_Value(state_dim, args.n_quantiles, args.n_nets).cuda()
+    actor = Actor(state_dim, action_dim).to(DEVICE)
+    critic = Critic(state_dim, action_dim, args.n_quantiles, args.n_nets).to(DEVICE)
+    critic_value = Critic_Value(state_dim, args.n_quantiles, args.n_nets).to(DEVICE)
     critic_target = copy.deepcopy(critic)
     critic_value_target = copy.deepcopy(critic_value)
 
@@ -63,8 +63,7 @@ def main(args, results_dir, models_dir, trace_dir, prefix):
                       tau=args.tau,
                       target_entropy=-np.prod(env.action_space.shape).item(),
                       trace_path=trace_dir/trace_file_name)
-    # pretrain_trace = 
-    evaluations = []
+    
     state, done = env.reset()[0], False
     episode_return = 0
     episode_timesteps = 0
@@ -96,14 +95,11 @@ def main(args, results_dir, models_dir, trace_dir, prefix):
             episode_timesteps = 0
             episode_num += 1
 
-        # Evaluate episode
-        if (t + 1) % args.eval_freq == 0:
-            file_name = f"{prefix}_{args.env}_{args.seed}"
-            evaluations.append(eval_policy(actor, eval_env, EPISODE_LENGTH))
-            np.save(results_dir / file_name, evaluations)
-            if args.save_model: trainer.save(models_dir / file_name)
-    with open("models/replay_buffer.pkl", "wb") as f:
-        dill.dump(replay_buffer, f)
+    file_name = f"{prefix}_{args.env}_{args.seed}"
+    if args.save_model: 
+        trainer.save(models_dir / file_name)
+        with open("models/replay_buffer.pkl", "wb") as f:
+            dill.dump(replay_buffer, f)
 
 def continue_train(args, models_dir, prefix):
 
@@ -171,6 +167,7 @@ def continue_train(args, models_dir, prefix):
             episode_return = 0
             episode_timesteps = 0
             episode_num += 1
+        
 
     #     # Evaluate episode
     #     if (t + 1) % args.eval_freq == 0:
@@ -181,23 +178,45 @@ def continue_train(args, models_dir, prefix):
     # with open("models/replay_buffer.pkl", "wb") as f:
     #     dill.dump(replay_buffer, f)
 
+def evaluate_policy(args, models_dir, prefix):
+     
+    eval_env = gym.make(args.env).unwrapped
+
+    eval_env = RescaleAction(eval_env, -1., 1.)
+
+    state_dim = eval_env.observation_space.shape[0]
+    action_dim = eval_env.action_space.shape[0]
+
+    actor = Actor(state_dim, action_dim).to(DEVICE)
+    file_name = f"{prefix}_{args.env}_{args.seed}_actor"
+    actor.load_state_dict((torch.load(models_dir / file_name)))
+
+    avg_reward, episode_reward = eval_policy(actor, eval_env, EPISODE_LENGTH, eval_episodes=10)
+    for index, reward in enumerate(episode_reward):
+        print("episode{} reward: {}".format(index+1, reward))
+    print("\nAverage reward: ", avg_reward)
+
+
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", default="Humanoid-v4")          # OpenAI gym environment name
-    parser.add_argument("--eval_freq", default=1e3, type=int)       # How often (time steps) we evaluate
+    parser.add_argument("--eval_freq", default=5e4, type=int)       # How often (time steps) we evaluate
     parser.add_argument("--max_timesteps", default=2e6, type=int)   # Max time steps to run environment
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--n_quantiles", default=25, type=int)
     parser.add_argument("--top_quantiles_to_drop_per_net", default=2, type=int)
     parser.add_argument("--n_nets", default=5, type=int)
-    parser.add_argument("--batch_size", default=256, type=int)      # Batch size for both actor and critic
+    parser.add_argument("--batch_size", default=64, type=int)      # Batch size for both actor and critic
     parser.add_argument("--discount", default=0.99, type=float)                 # Discount factor
     parser.add_argument("--tau", default=0.005, type=float)                     # Target network update rate
     parser.add_argument("--log_dir", default='.')
     parser.add_argument("--prefix", default='')
-    parser.add_argument("--save_model", default=True, action="store_true")        # Save model and optimizer parameters
-    parser.add_argument("--is_continue_train", default='')
+    parser.add_argument("--save_model", default=True, action="store_true")
+    parser.add_argument("--is_train", default=False)        # Save model and optimizer parameters
+    parser.add_argument("--is_continue_train", default=False)
     args = parser.parse_args()
 
     log_dir = Path(args.log_dir)
@@ -214,4 +233,10 @@ if __name__ == "__main__":
     if not os.path.exists(trace_dir):
         os.makedirs(trace_dir)
 
-    main(args, results_dir, models_dir, trace_dir, args.prefix)
+    if args.is_train == True:
+        pretrain(args, results_dir, models_dir, trace_dir, args.prefix)
+    elif args.is_continue_train == True:
+        continue_train(args, models_dir=models_dir, prefix=args.prefix)
+    else:
+        evaluate_policy(args, models_dir, args.prefix)
+
