@@ -45,6 +45,7 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
     action_dim = env.action_space.shape[0]
 
     replay_buffer = structures.ReplayBuffer(state_dim, action_dim)
+
     actor = Actor(state_dim, action_dim).to(DEVICE)
     critic = Critic(state_dim, action_dim, args.n_quantiles, args.n_nets).to(DEVICE)
     critic_value = Critic_Value(state_dim, args.n_quantiles, args.n_nets).to(DEVICE)
@@ -54,6 +55,7 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
 
     top_quantiles_to_drop = args.top_quantiles_to_drop_per_net * args.n_nets
     trace_file_name = f"trace{prefix}_{args.env}_{args.seed}_{nowtime}.pkl"
+    
     trainer = Trainer(actor=actor,
                       critic=critic,
                       critic_target=critic_target,
@@ -101,7 +103,7 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
         trainer.save(models_dir / file_name, nowtime)
         with open(models_dir / "replay_buffer.pkl", "wb") as f:
             dill.dump(replay_buffer, f)
-        with open(results_dir / "episode_return.pkl") as f:
+        with open(results_dir / "episode_return.pkl", "wb") as f:
             dill.dump(episode_return_list, f)
 
 def continue_train(args, models_dir, prefix, logtime, nowtime):
@@ -172,7 +174,7 @@ def continue_train(args, models_dir, prefix, logtime, nowtime):
         trainer.continue_train(replay_buffer, args.batch_size, Trace)
         Trace["mu_weight_amp"].append(trainer.dynamic_optimizer.state_dict()["state"][4]["amp"].cpu().detach().numpy())
         Trace["mu_weight_centre"].append(trainer.dynamic_optimizer.state_dict()["state"][4]["weight_centre"].cpu().detach().numpy())
-        
+
         if done or episode_timesteps >= EPISODE_LENGTH:
             # +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True
             print(f"Total T: {t + 1} Episode Num: {episode_num + 1} Episode T: {episode_timesteps} Reward: {episode_return:.3f}")
@@ -234,7 +236,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_quantiles", default=25, type=int)
     parser.add_argument("--top_quantiles_to_drop_per_net", default=2, type=int)
     parser.add_argument("--n_nets", default=5, type=int)
-    parser.add_argument("--batch_size", default=256, type=int)      # Batch size for both actor and critic
+    parser.add_argument("--batch_size", default=64, type=int)      # Batch size for both actor and critic
     parser.add_argument("--discount", default=0.99, type=float)                 # Discount factor
     parser.add_argument("--tau", default=0.005, type=float)                     # Target network update rate
     parser.add_argument("--log_dir", default='.')
