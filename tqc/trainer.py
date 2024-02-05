@@ -40,7 +40,7 @@ class Trainer(object):
 		# TODO: check hyperparams
 		self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=3e-4)
 		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=3e-4)
-		self.critic_value_optimizer = torch.optim.Adam(self.critic.parameters(), lr=3e-4)
+		self.critic_value_optimizer = torch.optim.Adam(self.critic_value.parameters(), lr=3e-4)
 		self.alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=3e-4)
 		self.dynamic_optimizer = DynamicSynapse(self.actor.parameters(), dt=15)
 
@@ -164,7 +164,9 @@ class Trainer(object):
 		alpha_loss = -self.log_alpha * (log_pi + self.target_entropy).detach().mean()
 		# actor_loss = (alpha * log_pi - self.critic(state, new_action).mean(2).mean(1, keepdim=True)).mean()
 		actor_loss = (cur_z - cur_z_value).reshape(batch_size, -1).mean().cpu().detach()
-
+		print("cur_z:{}  cur_z_value:{}".format(cur_z.mean().cpu().detach().item(), cur_z_value.mean().cpu().detach().item()))
+		# actor_loss *= 1e-5
+		# print(actor_loss)
 		trace["advantage"].append(actor_loss)
 		# --- Update ---
 		self.critic_optimizer.zero_grad()

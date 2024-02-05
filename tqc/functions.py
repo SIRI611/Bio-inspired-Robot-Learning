@@ -18,6 +18,7 @@ def eval_policy(policy, eval_env, max_episode_steps, eval_episodes=10):
             episode_reward += reward
             avg_reward += reward
             t += 1
+        print(episode_reward)
         episode_reward_list.append(episode_reward)
     avg_reward /= eval_episodes
     # policy.train()
