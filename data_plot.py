@@ -9,7 +9,7 @@ sns.set_style("darkgrid")
 class Config():
     def __init__(self) -> None:
         self.episode_return = "episode_return.pkl"
-        self.continue_train_trace = "Humanoid-v4_trace_continue_train_02-05_21-51-39"
+        self.continue_train_trace = "Humanoid-v4_trace_continue_train_02-06_16-50-13"
         self.start_plot_episode = None
         self.end_plot_episode = None
         self.i = 3              # i th dimension of action space, e.g i th neuro in last layer
@@ -124,6 +124,7 @@ if __name__ == "__main__":
 
     # ax[0].grid(True)
     ax[0].plot(step, data["advantage"], linewidth=0.6, label="Q-V")
+    ax[0].plot(step, data["Q"], linewidth=0.6, label="Q")
     # ax[0].plot(step, data["step_reward_average"], linewidth=1.5, label="step reward exp average")
     # ax[0].plot(step, data["step_reward_target"], linewidth=0.6, label="step reward exp average(net learn)")
     # ax[0].plot(step, data["reward_diff"], linewidth=0.15, label="reward diff")

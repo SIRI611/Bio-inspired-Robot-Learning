@@ -34,6 +34,7 @@ def calculate_amp_init(gradient_path, weight_path, k1=0.0000001, k2=0.00001):
     return amp_init
 
 def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
+
     episode_return_list = []
     # remove TimeLimit
     env = gym.make(args.env).unwrapped
@@ -109,6 +110,7 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
 
 def continue_train(args, models_dir, prefix, logtime, nowtime):
     Trace = {"step_reward": deque(),
+                "Q":deque(),
                 "advantage":deque(),
                       "episode_reward":deque(),
                       "mu_weight":deque(),
@@ -243,7 +245,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_dir", default='.')
     parser.add_argument("--prefix", default='')
     parser.add_argument("--save_model", default=True, action="store_true")
-    parser.add_argument("--is_train", default=True)        # Save model and optimizer parameters
+    parser.add_argument("--is_train", default=False)        
     parser.add_argument("--is_continue_train", default=True)
     args = parser.parse_args()
 
