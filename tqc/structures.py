@@ -5,6 +5,7 @@ from torch.distributions import Distribution, Normal
 from torch.nn.functional import relu, logsigmoid
 from gym import spaces
 import gym
+
 # from dynamicsynapse import DynamicSynapse
 from collections import deque
 

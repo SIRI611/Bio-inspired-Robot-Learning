@@ -245,8 +245,8 @@ if __name__ == "__main__":
     parser.add_argument("--log_dir", default='.')
     parser.add_argument("--prefix", default='')
     parser.add_argument("--save_model", default=True, action="store_true")
-    parser.add_argument("--is_train", default=False)        
-    parser.add_argument("--is_continue_train", default=True)
+    parser.add_argument("--is_train", default=True)        
+    parser.add_argument("--is_continue_train", default=False)
     args = parser.parse_args()
 
     log_dir = Path(args.log_dir)
