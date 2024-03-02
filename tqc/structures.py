@@ -3,8 +3,8 @@ import torch
 from torch.nn import Module, Linear
 from torch.distributions import Distribution, Normal
 from torch.nn.functional import relu, logsigmoid
-from gym import spaces
-import gym
+from gymnasium import spaces
+import gymnasium as gym
 
 # from dynamicsynapse import DynamicSynapse
 from collections import deque
@@ -62,7 +62,7 @@ class Mlp(Module):
 
 
 class ReplayBuffer(object):
-    def __init__(self, state_dim, action_dim, max_size=int(1e6)):
+    def __init__(self, state_dim, action_dim, max_size=int(1e4)):
         self.max_size = max_size
         self.ptr = 0
         self.size = 0

@@ -81,7 +81,7 @@ class Trainer(object):
 		cur_z = self.critic(state, action)
 		# print("cur_z:  ", cur_z)
 		cur_z_value = self.critic_value(state)
-		print("cur_z:{}  cur_z_value:{}".format(cur_z.mean().cpu().detach().item(), cur_z_value.mean().cpu().detach().item()))
+		# print("cur_z:{}  cur_z_value:{}".format(cur_z.mean().cpu().detach().item(), cur_z_value.mean().cpu().detach().item()))
 		critic_loss = quantile_huber_loss_f(cur_z, target)
 		critic_value_loss = quantile_huber_loss_f(cur_z_value, target_value)
 		# print("lossL  ", critic_loss)
