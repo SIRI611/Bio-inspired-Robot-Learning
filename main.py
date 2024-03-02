@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-import gym
+import gymnasium as gym
 import argparse
 import os
 import copy
@@ -13,9 +13,9 @@ from tqc.structures import Actor, Critic, RescaleAction, Critic_Value
 from tqc.dynamicsynapse import DynamicSynapse
 from tqc.functions import eval_policy
 from collections import deque
+import panda_gym
 
-
-EPISODE_LENGTH = 1000
+EPISODE_LENGTH = 50
 nowtime_ = time.strftime("%m-%d_%H-%M-%S", time.localtime())
 nowtime = copy.deepcopy(nowtime_)
 
@@ -37,14 +37,14 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
 
     episode_return_list = []
     # remove TimeLimit
-    env = gym.make(args.env).unwrapped
+    env = gym.make(args.env).unwrapped  
     eval_env = gym.make(args.env).unwrapped
 
     env = RescaleAction(env, -1., 1.)
     eval_env = RescaleAction(eval_env, -1., 1.)
-
-    state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.shape[0]
+    # TODO
+    state_dim = 18
+    action_dim = 3
 
     replay_buffer = structures.ReplayBuffer(state_dim, action_dim)
 
@@ -77,11 +77,11 @@ def pretrain(args, result_dir, models_dir, trace_dir, prefix, nowtime):
     trainer.actor.train()
     for t in range(int(args.max_timesteps)):
 
-        action = trainer.actor.select_action(state)
+        action = trainer.actor.select_action(state['observation'])
         next_state, reward, done, _, info = env.step(action)
         episode_timesteps += 1
-
-        replay_buffer.add(state, action, next_state, reward, done)
+        # print(episode_timesteps)
+        replay_buffer.add(state['observation'], action, next_state['observation'], reward, done)
 
         state = next_state
         episode_return += reward
@@ -231,9 +231,9 @@ def evaluate_policy(args, models_dir, prefix):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env", default="Humanoid-v4")          # OpenAI gym environment name
+    parser.add_argument("--env", default="PandaSlideDense-v3")          # OpenAI gym environment name
     parser.add_argument("--eval_freq", default=5e4, type=int)       # How often (time steps) we evaluate
-    parser.add_argument("--max_timesteps", default=2e6, type=int)   # Max time steps to run environment
+    parser.add_argument("--max_timesteps", default=50000, type=int)   # Max time steps to run environment
     parser.add_argument("--continue_timesteps", default=5e5, type=int)
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--n_quantiles", default=25, type=int)
