@@ -62,8 +62,8 @@ class Config():
         self.total_step = 2e6
         self.is_train = False
         self.is_continue_train = True
-        self.continue_train_episodes = int(1e3)
-        self.if_trace = 1
+        self.continue_train_episodes = int(1e6)
+        self.if_trace = 100
         self.if_predict = 0
 
         self.env = 'Humanoid-v4'
@@ -241,6 +241,7 @@ else:
                     action, _state = model_0.predict(state, deterministic=True)
                     state, reward, done, _, _ = env.step(action)
                     fall_step_predict = critic_net(np.concatenate((state, action))).detach().numpy()[0]
+                    model_1.actor.learn_dynamic(0, -1000)
                     if fall_step_predict < 0.5:
                         model_1_flag = 0
                         model_0_flag = 1

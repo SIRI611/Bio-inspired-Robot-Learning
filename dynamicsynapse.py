@@ -154,6 +154,9 @@ class DynamicSynapse(Optimizer):
             self.mode = 1
         if alpha > self.alpha_1:
             self.mode = 2
+        if alpha == -1000:
+            self.mode = 3
+
         
         if self.using_range_adapter:
             modulator_amount_osci = self.range_adapter.step_dynamics(self.defaults['dt'], reward, factor_rate=0.1)
@@ -301,6 +304,8 @@ class DynamicSynapse(Optimizer):
                 if self.mode == 2:
                     # if modulator_amount_osci > self.epsilon_0 / (self.weight_oscillate_decay * group['lr']):
                     amp *= torch.exp((beta) * group["dt"])
+                if self.mode == 3:
+                    continue
                     # if modulator_amount_osci > 2.:
                     #     # amp *= torch.exp((beta * 5) * group['dt'])
                     #     amp *= (self.k + self.k1 * torch.exp(torch.tensor( - (self.episode_step) / 200. - 0.25))) 
