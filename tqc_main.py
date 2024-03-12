@@ -4,6 +4,7 @@ import gymnasium as gym
 import numpy as np
 import torch
 import platform
+import math
 from critic import Critic
 from tqc import TQC
 import os
@@ -60,10 +61,10 @@ class Config():
         self.lr = 5e-5
         self.dt = 15
         self.total_step = 2e6
-        self.is_train = False
+        self.is_train = True
         self.is_continue_train = True
-        self.continue_train_episodes = int(1e3)
-        self.if_trace = 1
+        self.continue_train_episodes = int(1e4)
+        self.if_trace = 2
         self.if_predict = 0
 
         self.env = 'Humanoid-v4'
@@ -154,6 +155,7 @@ if para.is_train:
 else:
     model_0 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     model_1 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
+    model_2 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     # model = model_1
     reward_list = deque()
     reward_average = 0
@@ -205,7 +207,7 @@ else:
                                                        weight_oscillate_decay=1e-1
                                                         )
         #! define oscillate bound
-        model_1.actor.optimizer_dynamic.oscillate_bound = bound / 10
+        model_1.actor.optimizer_dynamic.oscillate_bound = bound / 5
         print(model_1.actor.optimizer_dynamic.oscillate_bound)
         
         for episode_idx in range(para.continue_train_episodes):
@@ -232,16 +234,20 @@ else:
             state = env.reset()[0]
             episode_reward = 0
             step = 0
+            step_to_stable = 0
             model_0_step = 0
             model_1_step = 0
             for _ in range(step_per_episode): 
                 # step += 1
                 if model_0_flag:
                     model_0_step += 1
+                    step_to_stable += 1
                     action, _state = model_0.predict(state, deterministic=True)
                     state, reward, done, _, _ = env.step(action)
                     fall_step_predict = critic_net(np.concatenate((state, action))).detach().numpy()[0]
-                    if fall_step_predict < 0.5:
+                    model_1.actor.learn_dynamic(0, -1000)
+
+                    if fall_step_predict < 0.5 or step_to_stable < 100:
                         model_1_flag = 0
                         model_0_flag = 1
                     else:
@@ -249,6 +255,7 @@ else:
                         model_0_flag = 0
                         print("Switch 0 to 1 | Step:{}".format(model_0_step))
                         model_0_step = 0
+                        step_to_stable = 0
                     if done:
                         break
 
@@ -293,7 +300,7 @@ else:
                     episode_reward += reward
 
 
-                    if para.if_trace and step % para.if_trace == 0:
+                    if para.if_trace and (step-1) % para.if_trace == 0:
                         para.Trace["step_reward"].append(reward)
                         para.Trace["step_reward_average"].append(reward_average)
                         # para.Trace["step_reward_target"].append(reward_target.detach().numpy())
@@ -320,24 +327,26 @@ else:
                                 reward_average,
                                 alpha))
 
-                if done:
-                    # model = checkpoint[-1]
-                    # print("Fall! Step:%d"%(step))
-                    break
+                    if done:
+                        # model = checkpoint[-1]
+                        # print("Fall! Step:%d"%(step))
+                        break
 
             episode_rewards.append(episode_reward)
             para.Trace["episode_reward"].append(episode_reward)
             para.Trace["episode_reward_average"].append(sum(episode_rewards)/len(episode_rewards))
-            para.Trace["episode_step"].append(step)
+            para.Trace["episode_step"].append(math.ceil(step / para.if_trace))
 
             # model.actor.optimizer_dynamic.episode_reward_average = sum(episode_rewards)/len(episode_rewards)
             # model.actor.optimizer_dynamic.episode_step = step
 
+
             #* episode monitor
             if model_0_flag:
-                print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
+                print("=="*50)
+                print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode len:",step, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
             if model_1_flag:
-                print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
+                print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode len:",step, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
                 print("oscillate bound:", model_1.actor.optimizer_dynamic.oscillate_bound) 
                 print("oscillate weight center:")
                 print(model_1.actor.optimizer_dynamic.state_dict()['state'][4]['weight_centre'])
@@ -345,10 +354,10 @@ else:
                 print("oscillate amp:")
                 print(model_1.actor.optimizer_dynamic.state_dict()['state'][4]['amp'])
 
-                if (episode_idx + 1) % np.floor(para.continue_train_episodes / 20) == 0 and not (episode_idx + 1) == para.continue_train_episodes:
-                    path = 'save_model_unfinished/'
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    model_1.save(path + 'continue_train_{}_{}_{}_{}_{}_unfinished.pkl'.format(para.env_name, para.total_step, para.continue_train_episodes, episode_idx+1, nowtime))
+            if (episode_idx + 1) % np.floor(para.continue_train_episodes / 20) == 0 and not (episode_idx + 1) == para.continue_train_episodes:
+                path = 'save_model_unfinished/'
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                model_1.save(path + 'continue_train_{}_{}_{}_{}_{}_unfinished.pkl'.format(para.env_name, para.total_step, para.continue_train_episodes, episode_idx+1, nowtime))
 
-                model_1.save("save_model/continue_train_{}_{}_{}_{}_finished.pkl".format(para.env_name, para.total_step, para.continue_train_episodes, nowtime))
+        model_1.save("save_model/continue_train_{}_{}_{}_{}_finished.pkl".format(para.env_name, para.total_step, para.continue_train_episodes, nowtime))

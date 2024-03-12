@@ -18,7 +18,7 @@ class Config():
     env_name = "humanoid_tqc"
     total_step=2e6
     num_test = 5000
-    if_train = 0
+    if_train = True
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
 def f2(x):
@@ -26,8 +26,8 @@ def f2(x):
 
 para = Config()
 model = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
-env = gym.make(para.env, render_mode="human")
-# env = gym.make(para.env)
+# env = gym.make(para.env, render_mode="human")
+env = gym.make(para.env)
 state_dim = env.observation_space.shape[0]
 action_dim = env.action_space.shape[0]
 critic_net = Critic(state_dim=state_dim+action_dim, device=para.device, hidden_dim=[256, 128, 64, 16])
@@ -58,7 +58,6 @@ if para.if_train:
             state, reward, done, _, _ = env.step(action)
             state_action_list.append(np.concatenate((state, action)))
             
-            # loss = critic_net.learn()
             if done:
                 iter = min(num, step)
                 replay_buffer.extend(state_action_list)

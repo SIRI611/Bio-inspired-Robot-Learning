@@ -10,7 +10,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'humanoid_tqc_trace_continue_train_0310_185900'
+        self.trace_name = 'humanoid_tqc_trace_continue_train_0312_045618'
         self.alpha_0 = -0.1
 
         self.alpha_1 = 0.05
@@ -100,6 +100,7 @@ def WherePlot(data, start_episode=None, end_episode=None):
         episode_index = [x for x in range(start_e, end_e + 1)]
 
     step_index = [x for x in range(start_step, end_step + 1)]
+    # print(len(step_index))
 
     keys = data.keys()
     for key in keys:

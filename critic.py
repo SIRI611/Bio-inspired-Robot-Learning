@@ -9,7 +9,7 @@ class Critic(nn.Module):
         super(Critic, self).__init__()
         self.state_dim = state_dim
         # self.action_dim = action_dim
-        self.gamma = gamma
+        # self.gamma = gamma
         self.lr = lr
         self.device = device
         
