@@ -85,7 +85,7 @@ if para.if_train:
                 # print(len(state_action_list))
                 fall_step.extend(step - np.array(step_temp))
 
-                repeat_num = min(30, step-para.step_num)
+                repeat_num = min(50, step-para.step_num)
                 replay_buffer_temp = np.repeat([state_action_list[-m-1] for m in range(repeat_num)], int((step-para.step_num) / repeat_num), axis=0)
                 fall_step_temp = np.repeat([n + fall_step_offset for n in range(repeat_num)], int((step-para.step_num) / repeat_num), axis=0)
                 # print(len(replay_buffer_temp), len(fall_step_temp))
@@ -120,7 +120,7 @@ if para.if_train:
 else:
     num = int(1e5)
     para.num_test = 10
-    predict_net.load_state_dict(torch.load("save_predict/" + "humanoid_tqc_2000000.0_1000_0313_110733_50" + ".pkl"))
+    predict_net.load_state_dict(torch.load("save_predict/" + "humanoid_tqc_2000000.0_1000_0313_110107_50" + ".pkl"))
     fall_step_predict = deque()
     fall_step_total = deque()
     state_action_actor = deque(maxlen=num)
