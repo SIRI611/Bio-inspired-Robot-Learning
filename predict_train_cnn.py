@@ -6,12 +6,13 @@ import gymnasium as gym
 import numpy as np
 import torch
 import os
+import copy
 
 from predict import Predict
 from tqc import TQC
 from collections import deque
 from scipy.signal import savgol_filter
-
+import dill
 # torch.set_default_dtype(torch.float64)
 
 class Config():
@@ -19,7 +20,7 @@ class Config():
     env_name = "humanoid_tqc"
     total_step=2e6
     num_test = 1000
-    if_train = True
+    if_train = False
     step_num = 20
     batch_size = 32
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -41,7 +42,7 @@ predict_net = Predict(batch_size=para.batch_size, device=para.device)
 
 if para.if_train:
     num = int(5e5)
-    replay_buffer_len = int(5e5)
+    replay_buffer_len = int(1e5)
     replay_buffer_list = [i for i in range(replay_buffer_len)]
     replay_buffer = deque(maxlen=replay_buffer_len)
     fall_step = deque(maxlen=replay_buffer_len)
@@ -76,7 +77,6 @@ if para.if_train:
                 step_temp.append(step - fall_step_offset)
             #! 10 inputs, what's the output? mean fall step?
             
-
             if done:
                 iter = min(num, step)
                 replay_buffer.extend(state_action_list)
@@ -85,9 +85,9 @@ if para.if_train:
                 # print(len(state_action_list))
                 fall_step.extend(step - np.array(step_temp))
 
-                repeat_num = min(50, step)
-                replay_buffer_temp = np.repeat([state_action_list[-m-1] for m in range(repeat_num)], int((step) / repeat_num), axis=0)
-                fall_step_temp = np.repeat([n + fall_step_offset for n in range(repeat_num)], int((step) / repeat_num), axis=0)
+                repeat_num = min(30, step-para.step_num)
+                replay_buffer_temp = np.repeat([state_action_list[-m-1] for m in range(repeat_num)], int((step-para.step_num) / repeat_num), axis=0)
+                fall_step_temp = np.repeat([n + fall_step_offset for n in range(repeat_num)], int((step-para.step_num) / repeat_num), axis=0)
                 # print(len(replay_buffer_temp), len(fall_step_temp))
 
                 replay_buffer.extend(replay_buffer_temp)
@@ -114,21 +114,24 @@ if para.if_train:
         os.makedirs('save_predict/')
     savepath = "save_predict/{}_{}_{}_{}_50.pkl".format(para.env_name, para.total_step, para.num_test, nowtime)
     torch.save(predict_net.state_dict(), savepath)
+    # with open("replay_buffer/")
             
         # print("final reward = ", np.mean(episode_rewards), "±", np.std(episode_rewards))
 else:
     num = int(1e5)
     para.num_test = 10
-    predict_net.load_state_dict(torch.load("save_predict/" + "humanoid_tqc_2000000.0_5000_0306_032220_50" + ".pkl"))
+    predict_net.load_state_dict(torch.load("save_predict/" + "humanoid_tqc_2000000.0_1000_0313_110733_50" + ".pkl"))
     fall_step_predict = deque()
     fall_step_total = deque()
     state_action_actor = deque(maxlen=num)
+    # predict_step = deque(maxlen=num)
     cluster = deque(maxlen=para.step_num)
     total_step = 0
     for i in range(para.num_test):
         state = env.reset()[0]
         cluster.clear()
         state_action_actor.clear()
+        # predict_step.clear()
         step = 0
         while(True):
             total_step += 1
@@ -138,24 +141,22 @@ else:
             state_action = np.concatenate((state, action, np.array([0])))
             cluster.append(state_action)
             if len(cluster) == para.step_num:
-                state_action_actor.append(cluster)
-                # predict_step = predict_net(np.expand_dims(np.array(cluster), axis=0)).detach().numpy()[0]
-                # fall_step_predict.append(predict_step)
-            # fall_step_total.append(predict_step)
-            # print(fall_step_predict)
+                state_action_actor.append(copy.deepcopy(cluster))
+
             if done:
                 print(step)
-                print(np.array(state_action_actor).shape)
+                # print(np.expand_dims(np.array(state_action_actor), axis=1).shape)
 
-                predict_step = predict_net(np.expand_dims(np.array(state_action_actor), axis=1))
-                window_length = 200  # 窗口长度
+                predict_step = predict_net(np.expand_dims(np.array(state_action_actor), axis=1)).detach().numpy()
+
+                window_length = min(200, step)  # 窗口长度
                 polyorder = 2      # 多项式阶数
-                y_smoothed = savgol_filter(predict_step, window_length, polyorder)
+                y_smoothed = savgol_filter(np.ravel(predict_step), window_length, polyorder)
                 plt.plot([x for x in range(len(state_action_actor))], predict_step, linewidth=0.6, label="origin")
                 plt.plot([x for x in range(len(state_action_actor))], y_smoothed, linewidth=0.8, label="smooth")
                 plt.axhline(0, linewidth=0.5, color='black')
                 plt.axhline(0.5, linewidth=0.5, color='black')
-                plt.legend()
+                plt.legend()    
                 plt.show()
                 # os.system("pause")
                 # fall_step_total.extend(fall_step_predict)

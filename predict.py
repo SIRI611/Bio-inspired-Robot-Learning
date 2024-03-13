@@ -36,7 +36,7 @@ class Predict(nn.Module):
         x = torch.Tensor(state)
         x = nn.functional.max_pool2d(self.activation(self.conv1(x)), (1, 4))
         x = nn.functional.max_pool2d(self.activation(self.conv2(x)), (1, 4))
-        x = x.reshape((self.batch_size, -1))
+        x = x.reshape((x.size()[0], -1))
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
         x = self.fc3(x)
@@ -53,3 +53,4 @@ class Predict(nn.Module):
         self.optimizer.step()
         
         return loss.item()
+

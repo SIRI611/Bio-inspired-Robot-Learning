@@ -33,7 +33,8 @@ from stable_baselines3.her.her_replay_buffer import HerReplayBuffer
 
 device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
 # device = torch.device("cpu")
-
+def f2(x):
+    return 2 / (1 + np.exp(- x * 0.02)) - 1
 class Config():
     def __init__(self) -> None:
         self.k1 = 0.00005
@@ -155,8 +156,19 @@ if para.is_train:
 else:
     model_0 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     model_1 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
-    model_2 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
+    # model_2 = TQC.load("save_model/{}_{}.pkl".format(para.env_name, para.total_step))
     # model = model_1
+
+    replay_buffer_len = int(1e5)
+    replay_buffer_list = [i for i in range(replay_buffer_len)]
+    replay_buffer = deque(maxlen=replay_buffer_len)
+    fall_step = deque(maxlen=replay_buffer_len)
+    loss_list = list()
+    num = int(1e5)
+    action_list = deque(maxlen=num)
+    state_list = deque(maxlen=num)
+    state_action_list = deque(maxlen=num)
+
     reward_list = deque()
     reward_average = 0
     reward_diff = 0
@@ -238,12 +250,13 @@ else:
             model_0_step = 0
             model_1_step = 0
             for _ in range(step_per_episode): 
-                # step += 1
+                step += 1
                 if model_0_flag:
                     model_0_step += 1
                     step_to_stable += 1
                     action, _state = model_0.predict(state, deterministic=True)
                     state, reward, done, _, _ = env.step(action)
+                    state_action_list.append(np.concatenate((state, action)))
                     fall_step_predict = critic_net(np.concatenate((state, action))).detach().numpy()[0]
                     model_1.actor.learn_dynamic(0, -1000)
 
@@ -257,6 +270,27 @@ else:
                         model_0_step = 0
                         step_to_stable = 0
                     if done:
+                        iter = min(num, step)
+                        replay_buffer.extend(state_action_list)
+                        fall_step.extend([iter - m - 1 for m in range(iter)])
+
+                        repeat_num = min(50, step)
+                        replay_buffer_temp = np.repeat([state_action_list[-m-1] for m in range(repeat_num)], int((step) / repeat_num), axis=0)
+                        fall_step_temp = np.repeat([n for n in range(repeat_num)], int((step) / repeat_num), axis=0)
+                        # print(len(replay_buffer_temp), len(fall_step_temp))
+
+                        replay_buffer.extend(replay_buffer_temp)
+                        fall_step.extend(fall_step_temp)
+
+                        if episode_idx > int(para.num_test / 100) or len(replay_buffer) == replay_buffer_len:
+                            for _ in range(5):
+                                if len(replay_buffer) < replay_buffer_len:
+                                    sample = np.random.choice([i for i in range(len(replay_buffer))], size=512, replace=False)
+                                else:
+                                    sample = np.random.choice(replay_buffer_list, size=1024, replace=False)
+                                for j in sample:
+                                    loss = critic_net.learn(replay_buffer[j], f2(fall_step[j]))
+                                    loss_list.append(loss)
                         break
 
                 elif model_1_flag:
@@ -264,6 +298,7 @@ else:
                     action, _state = model_1.predict(state, deterministic=True)
                     state, reward, done, _, _ = env.step(action)
                     fall_step_predict = critic_net(np.concatenate((state, action))).detach().numpy()[0]
+                    state_action_list.append(np.concatenate((state, action)))
                     if fall_step_predict < 0.5:
                         model_1_flag = 0
                         model_0_flag = 1
@@ -330,6 +365,7 @@ else:
                     if done:
                         # model = checkpoint[-1]
                         # print("Fall! Step:%d"%(step))
+                        
                         break
 
             episode_rewards.append(episode_reward)

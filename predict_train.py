@@ -18,7 +18,7 @@ class Config():
     env_name = "humanoid_tqc"
     total_step=2e6
     num_test = 5000
-    if_train = True
+    if_train = False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
 def f2(x):
@@ -34,8 +34,8 @@ critic_net = Critic(state_dim=state_dim+action_dim, device=para.device, hidden_d
 
 
 if para.if_train:
-    num = int(1e6)
-    replay_buffer_len = int(1e6)
+    num = int(1e5)
+    replay_buffer_len = int(1e5)
     replay_buffer_list = [i for i in range(replay_buffer_len)]
     replay_buffer = deque(maxlen=replay_buffer_len)
     fall_step = deque(maxlen=replay_buffer_len)
@@ -112,7 +112,7 @@ else:
             # print(fall_step_predict)
             if done:
                 print(step)
-                window_length = 200  # 窗口长度
+                window_length = min(200, step)  # 窗口长度
                 polyorder = 2      # 多项式阶数
                 y_smoothed = savgol_filter(fall_step_predict, window_length, polyorder)
                 plt.plot([x for x in range(step)], fall_step_predict, linewidth=0.6, label="origin")
