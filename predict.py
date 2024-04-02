@@ -13,7 +13,7 @@ class Predict(nn.Module):
         self.device = device
         self.conv1 = nn.Conv2d(1, 6, (5, 11))
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16*23*12, 64)
+        self.fc1 = nn.Linear(16*12*23, 64)
         self.fc2 = nn.Linear(64, 16)
         self.fc3 = nn.Linear(16, 1)
         
@@ -34,7 +34,8 @@ class Predict(nn.Module):
     def forward(self, state):
         
         x = torch.Tensor(state)
-        x = nn.functional.max_pool2d(self.activation(self.conv1(x)), (1, 4))
+        x = self.conv1(x)
+        x = nn.functional.max_pool2d(self.activation(x), (1, 4))
         x = nn.functional.max_pool2d(self.activation(self.conv2(x)), (1, 4))
         x = x.reshape((x.size()[0], -1))
         x = self.activation(self.fc1(x))

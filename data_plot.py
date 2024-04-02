@@ -10,7 +10,7 @@ from tracereader import TraceReader
 
 class Config():
     def __init__(self) -> None:
-        self.trace_name = 'humanoid_tqc_trace_continue_train_0312_045618'
+        self.trace_name = 'humanoid_tqc_trace_continue_train_0402_214923'
         self.alpha_0 = -0.1
 
         self.alpha_1 = 0.05
@@ -34,7 +34,8 @@ class Config():
                       "mu_bias_amp": deque(),
                       "mu_bias_centre":deque(),
                       "episode_step":deque(),
-                      "critic_loss":deque()}
+                      "critic_loss":deque(),
+                      "if_trace":deque()}
 
 def ChooseContinueTracePath():
     if platform.node() == 'robot-GALAX-B760-METALTOP-D4':
@@ -99,12 +100,12 @@ def WherePlot(data, start_episode=None, end_episode=None):
     else:
         episode_index = [x for x in range(start_e, end_e + 1)]
 
-    step_index = [x for x in range(start_step, end_step + 1)]
-    # print(len(step_index))
+    step_index = [x for x in range(start_step, end_step + 1 )]
+    print(len(step_index))
 
     keys = data.keys()
     for key in keys:
-        if not len(data[key]) == 0:
+        if len(data[key]) != 0 and key != "if_trace":
             data[key] = np.array(data[key])
             if key == 'episode_reward':
                 data['episode_reward'] = data['episode_reward'][episode_index]
@@ -134,7 +135,7 @@ fig.get_tight_layout()
 if single:
     fig.suptitle("episode {}".format(episode[0]))
 else:
-    fig.suptitle("from episode {} to episode {}".format(episode[0], episode[-1]))
+    fig.suptitle("from episode {} to episode {}, trace interval = {}".format(episode[0], episode[-1], data["if_trace"][0]))
 
 # ax[0].grid(True)
 ax[0].plot(step, data["step_reward"], linewidth=0.6, label="step reward")

@@ -16,6 +16,7 @@ def f2(x):
     return 2 / (1 + np.exp(- x * 0.02)) - 1
 
 # plt.plot([x for x in range(num)], [f1(x) for x in range(num)], label="f1")
+print(np.random.randint(0, 10, 1))
 plt.plot([x for x in range(num)], [f2(x) for x in range(num)], label="f2")
 # plt.plot([x for x in range(num)], [f(x) for x in range(num)], label="f")
 plt.axvline(200)
