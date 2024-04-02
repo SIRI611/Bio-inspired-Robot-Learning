@@ -65,7 +65,7 @@ class Config():
         self.is_train = False
         self.is_continue_train = True
         self.continue_train_episodes = int(1e4)
-        self.if_trace = 1
+        self.if_trace = 2
         self.if_predict = 0
         self.device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
         self.env = 'Humanoid-v4'
