@@ -72,8 +72,8 @@ if para.if_train:
                 
                 # fall_step.append([i for i in range(step-1, -1, -1)])
                 
-                # if episode_idx >= para.num_test / 50 or len(replay_buffer) == replay_buffer_len:
-                if episode_idx >= 1 or len(replay_buffer) == replay_buffer_len:
+                if episode_idx >= para.num_test / 50 or len(replay_buffer) == replay_buffer_len:
+                # if episode_idx >= 1 or len(replay_buffer) == replay_buffer_len:
                     for _ in range(5):                      
                         sample = np.random.choice([i for i in range(len(replay_buffer))], size=para.batch_size, replace=True)
                         fall_step_list.clear()
