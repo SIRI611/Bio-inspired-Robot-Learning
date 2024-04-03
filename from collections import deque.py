@@ -17,11 +17,13 @@ def f2(x):
 
 # plt.plot([x for x in range(num)], [f1(x) for x in range(num)], label="f1")
 print(np.random.randint(0, 10, 1))
-plt.plot([x for x in range(num)], [f2(x) for x in range(num)], label="f2")
-# plt.plot([x for x in range(num)], [f(x) for x in range(num)], label="f")
-plt.axvline(200)
-plt.legend()
-plt.show()
+temp = [1,1,1,1,1,1,1,1,1,2,2,2,2,4,5,5,667,7,564,3,56]
+print(temp[-1:-10:-1])
+# plt.plot([x for x in range(num)], [f2(x) for x in range(num)], label="f2")
+# # plt.plot([x for x in range(num)], [f(x) for x in range(num)], label="f")
+# plt.axvline(200)
+# plt.legend()
+# plt.show()
 
 # A = np.array([1, 3, 5, 7, 9, 11])
 # where1 = np.where(A == 1)

@@ -56,8 +56,10 @@ class Config():
 
         self.alpha_0 = -0.1
         self.alpha_1 = 0.05
-        self.a = 1e-5
-        self.b = -2e-5
+        # self.a = 1e-5
+        self.a = 0
+        # self.b = -2e-5
+        self.b = 0
         self.period = 4000
         self.lr = 5e-5
         self.dt = 15
@@ -210,7 +212,7 @@ else:
         step_per_episode = int(1e4)
         # checkpoint_step = 1000
         # checkpoint = deque(maxlen=int(step_per_episode / checkpoint_step))
-        episode_record = deque()
+        # episode_record = deque()
         fall_step_list = deque(maxlen=para.batch_size)
         inputs = deque(maxlen=para.batch_size)
         model_0_flag = 1    #origin
@@ -219,7 +221,7 @@ else:
         if para.if_critic:
             state_dim = env.observation_space.shape[0]
             action_dim = env.action_space.shape[0]
-            predict_net = Predict(batch_size=para.batch_size, device=para.device)      
+            predict_net = Predict(batch_size=para.batch_size, device=para.device, lr=1e-4)      
             predict_net.load_state_dict(torch.load("save_predict/" + "humanoid_tqc_2000000.0_1000_0313_213520_50" + ".pkl"))
 
         nowtime = time.strftime("%m%d_%H%M%S", time.localtime())
@@ -231,11 +233,11 @@ else:
                                                        alpha_1=para.alpha_1,
                                                        weight_oscillate_decay=1e-1)
         #! define oscillate bound
-        model_1.actor.optimizer_dynamic.oscillate_bound = bound / 5
+        model_1.actor.optimizer_dynamic.oscillate_bound = bound / 2
         print(model_1.actor.optimizer_dynamic.oscillate_bound)
         
         for episode_idx in range(para.continue_train_episodes):
-            episode_record.clear()
+            episode_record = []
             loss_list.clear()
             
             if (episode_idx + 1) % 5 == 0:
@@ -312,6 +314,7 @@ else:
                     if done:
                         replay_buffer.append(episode_record)
                         
+                        # if episode_idx >= para.continue_train_episodes / 50 or len(replay_buffer) == replay_buffer_len:
                         if episode_idx >= 1 or len(replay_buffer) == replay_buffer_len:
                             for _ in range(5):
                                 sample = np.random.choice([i for i in range(len(replay_buffer))], size=para.batch_size, replace=True)
@@ -427,6 +430,7 @@ else:
                         # print("Fall! Step:%d"%(step))
                         replay_buffer.append(episode_record)
                         
+                        # if episode_idx >= para.continue_train_episodes / 50 or len(replay_buffer) == replay_buffer_len:
                         if episode_idx >= 1 or len(replay_buffer) == replay_buffer_len:
                             for _ in range(5):
                                 sample = np.random.choice([i for i in range(len(replay_buffer))], size=para.batch_size, replace=True)
@@ -470,6 +474,10 @@ else:
                 print("\n")
                 print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode len:",step, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
                 print("=="*60,"\n")
+                if len(loss_list) > 0:
+                    max_loss = np.max(loss_list)
+                    print("train num: %-*d  step: %-*d  mean loss: %-*.7f  max loss: %-*.7f  replay buffer: %-*d"%(
+                6, episode_idx, 6, step, 12, np.mean(loss_list), 12, max_loss, 6, len(replay_buffer)))
             if model_1_flag:
                 print("\n")
                 print("episode:", episode_idx, "\nepisode reward:", episode_reward, "episode len:",step, "episode reward average:", sum(episode_rewards)/len(episode_rewards))
@@ -480,6 +488,10 @@ else:
                 print("oscillate amp:")
                 print(model_1.actor.optimizer_dynamic.state_dict()['state'][4]['amp'])
                 print("=="*60, "\n")
+                if len(loss_list) > 0:
+                    max_loss = np.max(loss_list)
+                    print("train num: %-*d  step: %-*d  mean loss: %-*.7f  max loss: %-*.7f  replay buffer: %-*d"%(
+                6, episode_idx, 6, step, 12, np.mean(loss_list), 12, max_loss, 6, len(replay_buffer)))
 
             if (episode_idx + 1) % np.floor(para.continue_train_episodes / 20) == 0 and not (episode_idx + 1) == para.continue_train_episodes:
                 path = 'save_model_unfinished/'

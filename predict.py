@@ -5,17 +5,18 @@ import torch.optim as optim
 
 
 class Predict(nn.Module):
-    def __init__(self, batch_size, device, gamma=0.99, lr=1e-5):
+    def __init__(self, batch_size, device, gamma=0.99, lr=3e-4):
         super(Predict, self).__init__()
         # self.gamma = gamma
         self.batch_size = batch_size
         self.lr = lr
         self.device = device
-        self.conv1 = nn.Conv2d(1, 6, (5, 11))
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16*12*23, 64)
-        self.fc2 = nn.Linear(64, 16)
-        self.fc3 = nn.Linear(16, 1)
+        self.conv1 = nn.Conv2d(1, 8, 5, padding=2)
+        self.conv2 = nn.Conv2d(8, 64, 3, padding=1)
+        self.fc1 = nn.Linear(64*10*197, 2048)
+        self.fc2 = nn.Linear(2048, 256)
+        self.fc3 = nn.Linear(256, 32)
+        self.fc4 = nn.Linear(32, 1)
         
         self.activation = nn.ReLU()
         self.criterion = nn.MSELoss()
@@ -35,12 +36,13 @@ class Predict(nn.Module):
         
         x = torch.Tensor(state)
         x = self.conv1(x)
-        x = nn.functional.max_pool2d(self.activation(x), (1, 4))
-        x = nn.functional.max_pool2d(self.activation(self.conv2(x)), (1, 4))
+        x = self.activation(self.conv2(x))
+        x = nn.functional.max_pool2d(self.activation(x), (2, 2))
         x = x.reshape((x.size()[0], -1))
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
-        x = self.fc3(x)
+        x = self.activation(self.fc3(x))
+        x = self.fc4(x)
 
         return x
 
