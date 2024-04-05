@@ -15,6 +15,9 @@ from collections import deque
 from scipy.signal import savgol_filter
 import dill
 # torch.set_default_dtype(torch.float64)
+import gc
+gc.collect()
+torch.cuda.empty_cache()
 
 class Config():
     env = "Humanoid-v4"
@@ -23,7 +26,7 @@ class Config():
     num_test = 1000
     if_train = True
     step_num = 20
-    batch_size = 1024
+    batch_size = 512
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
 def f2(x):
@@ -94,7 +97,7 @@ if para.if_train:
                         # print(replay_buffer[sample].shape)
                         inputs_ = np.expand_dims(np.array(inputs), axis=1)
                         target = np.array([f2(fall_step_num) for fall_step_num in fall_step_list]).reshape((para.batch_size, -1))
-                        loss = predict_net.learn(torch.tensor(inputs_, dtype=torch.float32).to(para.device), torch.tensor(target, dtype=torch.float32).to(para.device))
+                        loss = predict_net.learn(torch.tensor(inputs_, dtype=torch.float32), torch.tensor(target, dtype=torch.float32))
                         loss_list.append(loss)
                 break
         if len(loss_list) > 0:

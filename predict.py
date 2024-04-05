@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Predict(nn.Module):
     def __init__(self, batch_size, device, gamma=0.99, lr=3e-4):
@@ -47,7 +48,8 @@ class Predict(nn.Module):
         return x
 
     def learn(self, states, td_target_values):
-
+        states = states.to(device)
+        td_target_values = td_target_values.to(device)
         current_value = self.forward(states)
         loss = self.criterion(current_value, td_target_values)
 
